@@ -77,3 +77,33 @@ void motorControl::stop()
 {
     *this->CCR = 0;
 }
+
+// float motorControl::PID_Compute(PID_Controller_t *pid, float current_velocity) 
+// {
+//     // 1. Tính sai số
+//     float error = pid->setpoint - current_velocity;
+
+//     // 2. Tính khâu P
+//     float P_out = pid->Kp * error;
+
+//     // 3. Tính khâu I (Có chống Wind-up - cực kỳ quan trọng)
+//     pid->error_sum += (pid->Ki * error);
+//     // Chống tràn khâu I (Anti-windup) để khi kẹt bánh motor không bị rồ lên
+//     if (pid->error_sum > pid->out_max) pid->error_sum = pid->out_max;
+//     else if (pid->error_sum < pid->out_min) pid->error_sum = pid->out_min;
+    
+//     float I_out = pid->error_sum;
+
+//     // 4. Tính khâu D
+//     float D_out = pid->Kd * (error - pid->prev_error);
+//     pid->prev_error = error; // Lưu lại cho lần sau
+
+//     // 5. Tổng hợp ngõ ra
+//     float output = P_out + I_out + D_out;
+
+//     // 6. Giới hạn ngõ ra trong khoảng cấu hình PWM của Timer (VD: -1000 đến 1000)
+//     if (output > pid->out_max) output = pid->out_max;
+//     else if (output < pid->out_min) output = pid->out_min;
+
+//     return output;
+// }

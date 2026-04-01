@@ -84,7 +84,8 @@
 
 
 #include "uartDMA.hpp"
-#include "data.hpp" // PHẢI include để lấy đối tượng uartDriver toàn cục
+#include "config.hpp"
+// #include "data.hpp" // PHẢI include để lấy đối tượng uartDriver toàn cục
 
 // XÓA DÒNG NÀY: static UartDma g_uartDriver; (Vì chúng ta dùng đối tượng chung trong data.cpp)
 

@@ -5,6 +5,8 @@
 #include "main.h"
 #include "pin_config.hpp"
 
+#include "math.h" // Để dùng hàm fabs() hoặc abs()
+
 enum class MotorDir : uint8_t {
     Forward = 0,
     Backward = 1
@@ -27,5 +29,7 @@ public:
     void init(TIM_HandleTypeDef *htim, uint32_t timerChanel, GPIO_TypeDef* dirPort, uint16_t dirPin);
     void control(uint16_t speed, MotorDir dir);
     void stop();
+
+    // float PID_Compute(PID_Controller_t *pid, float current_velocity);
 };
 #endif
