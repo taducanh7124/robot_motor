@@ -1,0 +1,17 @@
+# ===== IAR EWARM build artifacts =====
+EWARM/**/Obj/
+EWARM/**/.ninja_log
+EWARM/**/*.pbi
+EWARM/**/Exe/
+EWARM/**/*.out
+EWARM/**/*.map
+EWARM/**/*.dep
+
+# ===== Binary =====
+*.hex
+*.bin
+*.elf
+
+# ===== Backup folders =====
+Core/Src/Backup/
+Core/Inc/Backup/
