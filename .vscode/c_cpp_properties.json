@@ -7,7 +7,7 @@
             ],
             "defines": [
                 "USE_HAL_DRIVER",
-                "STM32F103xE"
+                "STM32F401xC"
             ],
             "cStandard": "c11",
             "cppStandard": "c++11",
@@ -18,7 +18,7 @@
                 ],
                 "limitSymbolsToIncludedHeaders": true
             },
-            "compilerPath": "C:/msys64/ucrt64/bin/g++.exe"
+            "compilerPath": "C:/msys64/ucrt64/bin/gcc.exe"
         }
     ],
     "version": 4

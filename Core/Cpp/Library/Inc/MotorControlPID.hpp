@@ -32,26 +32,34 @@
 
 #include "MotorControl.hpp"
 
+typedef enum
+{
+    LEFT = 0,
+    RIGHT = 1
+} dir_t;
+
 // Lưu ý: Đảm bảo tên class cha "motorControl" khớp chính xác với thư viện của bạn
-class MotorControlPID : public motorControl 
+class MotorControlPID : public motorControl
 {
 private:
     // Cấu trúc dữ liệu cho PID
-    typedef struct {
-        float Kp, Ki, Kd;       // Các hệ số
-        float setpoint;         // Vận tốc mong muốn (xung/10ms)
-        float error_sum;        // Khâu tích phân (I) cộng dồn
-        float prev_error;       // Sai số quá khứ để tính Vi phân (D)
-        float out_max;          // Giới hạn PWM lớn nhất (VD: 1000)
+    typedef struct
+    {
+        float Kp, Ki, Kd; // Các hệ số
+        float setpoint;   // Vận tốc mong muốn (xung/10ms)
+        float error_sum;  // Khâu tích phân (I) cộng dồn
+        float prev_error; // Sai số quá khứ để tính Vi phân (D)
+        float out_max;    // Giới hạn PWM lớn nhất (VD: 1000)
+        dir_t right;
     } PID_Controller_t;
 
-    PID_Controller_t pid;       // Đã sửa lại lỗi viết hoa/thường (PID_Controller_t)
+    PID_Controller_t pid; // Đã sửa lại lỗi viết hoa/thường (PID_Controller_t)
 
 public:
     // Các hàm khởi tạo ban đầu của bạn
-    void init(TIM_HandleTypeDef *htim, uint32_t timerChannel, GPIO_TypeDef* dirPort, uint16_t dirPin);
-    void initPID(TIM_HandleTypeDef *htim, uint32_t timerChannel, GPIO_TypeDef* dirPort, uint16_t dirPin, float Kp, float Ki, float Kd, float out_max);
-    
+    // void init(TIM_HandleTypeDef *htim, uint32_t timerChannel, GPIO_TypeDef* dirPort, uint16_t dirPin);
+    void initPID(TIM_HandleTypeDef *htim, uint32_t timerChannel, GPIO_TypeDef *dirPort, uint16_t dirPin, float Kp, float Ki, float Kd, float out_max, dir_t dir);
+
     // --- CÁC HÀM PHÁT TRIỂN THÊM ---
 
     // Thay đổi vận tốc mục tiêu một cách linh hoạt
@@ -71,14 +79,14 @@ public:
     void stop();
 };
 
-
 // wraper C
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-// ngat timer 10ms de goi ham computeAndControl() cua tung doi tuong MotorControlPID tu main_cpp.cpp
-void computeAndControlWrapper(MotorControlPID* motor, float current_speed);
+    // ngat timer 10ms de goi ham computeAndControl() cua tung doi tuong MotorControlPID tu main_cpp.cpp
+    void computeAndControlWrapper(MotorControlPID *motor, float current_speed);
 
 #ifdef __cplusplus
 }

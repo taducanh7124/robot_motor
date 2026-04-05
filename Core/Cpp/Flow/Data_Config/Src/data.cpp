@@ -8,14 +8,14 @@ RobotDrive_t robot = {
 };
 
 // khai bao
-motorControl frontLeftMotor;
-motorControl frontRightMotor;
-motorControl rearLeftMotor;
-motorControl rearRightMotor;
+MotorControlPID frontLeftMotor;
+MotorControlPID frontRightMotor;
+MotorControlPID rearLeftMotor;
+MotorControlPID rearRightMotor;
 
 EncoderData_t encoderData;
 
-PID_Controller_t pid_FL, pid_FR, pid_RL, pid_RR;
+// PID_Controller_t pid_FL, pid_FR, pid_RL, pid_RR;
 
 uint8_t bufferUART[200];
 UartDma uartDriver;

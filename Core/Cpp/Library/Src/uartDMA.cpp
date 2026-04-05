@@ -85,9 +85,6 @@
 
 #include "uartDMA.hpp"
 #include "config.hpp"
-// #include "data.hpp" // PHẢI include để lấy đối tượng uartDriver toàn cục
-
-// XÓA DÒNG NÀY: static UartDma g_uartDriver; (Vì chúng ta dùng đối tượng chung trong data.cpp)
 
 void UartDma::init(UART_HandleTypeDef* huart, uint8_t* rxBuffer, uint16_t size) {
     _huart = huart;

@@ -35,7 +35,7 @@ void motorControl::init(TIM_HandleTypeDef *htim, uint32_t timerChanel, GPIO_Type
     this->ARR = this->htimPWM->Instance->ARR;
 
     // bat bam xung PWM
-    // HAL_TIM_PWM_Start(this->htimPWM, this->timerChanel);
+    HAL_TIM_PWM_Start(this->htimPWM, this->timerChanel);
     this->stop();
 }
 

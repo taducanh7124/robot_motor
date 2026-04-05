@@ -4,7 +4,7 @@
 #include "stdint.h"
 
 // thu vien nguoi dung
-#include "MotorControl.hpp"
+#include "MotorControlPID.hpp"
 #include "uartDMA.hpp"
 
 // dieu lieu dieu khien nhan qua UART
@@ -12,7 +12,8 @@ typedef struct
 {
     uint8_t dir;
     uint16_t pwm;
-    uint16_t velocity;
+    int16_t velocity;
+    float setpoint;
 } dataControl_t;
 
 typedef struct
@@ -66,13 +67,13 @@ typedef struct {
 extern RobotDrive_t robot;
 extern EncoderData_t encoderData;
 
-extern motorControl frontLeftMotor;
-extern motorControl frontRightMotor;
-extern motorControl rearLeftMotor;
-extern motorControl rearRightMotor;
+extern MotorControlPID frontLeftMotor;
+extern MotorControlPID frontRightMotor;
+extern MotorControlPID rearLeftMotor;
+extern MotorControlPID rearRightMotor;
 
-// Khai báo 4 bộ PID cho 4 bánh
-extern PID_Controller_t pid_FL, pid_FR, pid_RL, pid_RR;
+// // Khai báo 4 bộ PID cho 4 bánh
+// extern PID_Controller_t pid_FL, pid_FR, pid_RL, pid_RR;
 
 // buffer nhan UART
 extern uint8_t bufferUART[200];

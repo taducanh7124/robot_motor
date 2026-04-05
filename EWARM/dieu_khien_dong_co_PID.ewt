@@ -1230,6 +1230,9 @@
                         <name>$PROJ_DIR$\..\Core\Cpp\Library\Src\MotorControl.cpp</name>
                     </file>
                     <file>
+                        <name>$PROJ_DIR$\..\Core\Cpp\Library\Src\MotorControlPID.cpp</name>
+                    </file>
+                    <file>
                         <name>$PROJ_DIR$\..\Core\Cpp\Library\Src\uartDMA.cpp</name>
                     </file>
                 </group>
@@ -1246,7 +1249,7 @@
                     <name>$PROJ_DIR$\..\Core\Cpp\Flow\Main\Src\main_cpp.cpp</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\Core\Cpp\Flow\Output\Src\output.cpp</name>
+                    <name>$PROJ_DIR$\..\Core\Cpp\Flow\Output\Src\odometry.cpp</name>
                 </file>
             </group>
         </group>
