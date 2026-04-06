@@ -1,83 +1,109 @@
+/*
+- dữ liệu cần gửi lên pi
++ x (mét): tọa độ x, số mét đã di dọc theo trục x
++ y (mét): tọa độ y, số mét đã di dọc theo trục y
++ theta (radian): góc xoay so với gốc
++ vx (mét/giây): tốc độ đi dọc tại thời điểm đo vận tốc
++ vy (mét/giây): không dùng vì robot không đi ngang
++ w (radian/giây): tốc độ quay quanh trục hoặc rẽ hướng khác
+
+- các tính các dữ liệu
++ x: tổng sigma [quãng đường robot đã đi × cos(theta)]
++ y: tổng sigma [quãng đường robot đã đi × sin(theta)]
++ theta: dùng cảm biến la bàn lấy góc
++ vx: quãng đường robot đã đi ÷ thời gian
++ vy: không tính
++ w: (góc mới - góc cũ) ÷ thời gian, lưu ý số âm
+
+- tính thông số cơ bản
++ chu vi bánh xe
++ tổng số xung khi quay trọn 1 vòng
++ hệ số chu vi ÷ tổng xung ->số xung × hệ số -> quãng đường
++ tính quãng đường 2 bánh trái/phải đã đi, chia trung bình -> quãng đường robot đã đi
+*/
+
 #include "output.hpp"
 #include "math.h"
 #include "config.hpp"
 #include "stdio.h"
 
 #define PI 3.14159265358979323846
-#define R 0.05f // Bán kính bánh xe (mét)
-#define PPR 360 // Xung/vòng của encoder
-#define L 0.15f // Nửa khoảng cách giữa 2 bánh (mét)
+#define chuViBanh 0.3; // met
+#define xung1Vong 500 // xung/vòng của encoder
+#define heSoXung chuViBanh / xung1Vong // he so doi xung sang met
 
-// luu tru vi tri
+// bien luu vi tri toa do va huong robot
 float odom_x = 0.0f;
 float odom_y = 0.0f;
 float odom_theta = 0.0f;
 
-// luu tru van toc
+// bien luu van toc robot
 float odom_vx = 0.0f;
 float odom_w = 0.0f;
 
-void CalculateOdometry()
+// bien luu van toc banh
+float vtBanhTrenTrai = 0.0f;
+float vtBanhDuoiTrai = 0.0f;
+float vtBanhTrenPhai = 0.0f;
+float vtBanhDuoiPhai = 0.0f;
+float vtTrungBinhTrai = 0.0f;
+float vtTrungBinhPhai = 0.0f;
+float vtTrungBinhTong = 0.0f;
+
+// bien thoi gian
+float dt = 10.0f; // 10 milli giay
+float thoiGianCuOdom = 0.0f; // thoi gian truoc do tinh odom
+float thoiGianCuGui = 0.0f; // thoi gian truoc do gui du lieu len pi
+
+// tinh toa do, thong so odometry
+void tinhOdom()
 {
-    // 1. QUY ĐỔI: XUNG/10ms -> MÉT/GIÂY
-    // Công thức: (Số xung / 10ms) * 100 (ra xung/giây) / PPR * Chu_vi_bánh
-    float k_v = (100.0f * 2.0f * PI * R) / PPR;
+    // tinh odom moi 10 ms
+    if(HAL_GetTick() - thoiGianCuOdom < dt)
+    {
+        return; // Chưa đủ 10ms, thoát hàm
+    }
+    thoiGianCuOdom = HAL_GetTick(); // Cập nhật mốc thời gian
 
-    float v_FL = robot.front_left.velocity * k_v;
-    float v_FR = robot.front_right.velocity * k_v;
-    float v_RL = robot.rear_left.velocity * k_v;
-    float v_RR = robot.rear_right.velocity * k_v;
+    // van toc vx
+    vtBanhTrenTrai = robot.rear_left.velocity * heSoXung;
+    vtBanhDuoiTrai = robot.front_left.velocity * heSoXung;
+    vtBanhTrenPhai = robot.rear_right.velocity * heSoXung;
+    vtBanhDuoiPhai = robot.front_right.velocity * heSoXung;
+    vtTrungBinhTrai = (vtBanhTrenTrai + vtBanhDuoiTrai) / 2.0f;
+    vtTrungBinhPhai = (vtBanhTrenPhai + vtBanhDuoiPhai) / 2.0f;
+    vtTrungBinhTong = (vtTrungBinhTrai + vtTrungBinhPhai) / 2.0f;
 
-    // 2. VẬN TỐC TRUNG BÌNH MỖI BÊN BÁNH
-    float v_left = (v_FL + v_RL) / 2.0f;
-    float v_right = (v_FR + v_RR) / 2.0f;
+    // toa do x, y
+    odom_x += vtTrungBinhTong * cos(odom_theta);
+    odom_y += vtTrungBinhTong * sin(odom_theta);
 
-    // 3. ĐỘNG HỌC THUẬN (FORWARD KINEMATICS)
-    odom_vx = (v_right + v_left) / 2.0f;
-    odom_w = (v_right - v_left) / (2.0f * L);
+    // huong theta
 
-    // 4. TÍCH PHÂN TỌA ĐỘ (ODOMETRY)
-    float dt = 0.01f; // Do ta đang tính mỗi 10ms (0.01 giây)
-    
-    odom_theta += odom_w * dt;
-
-    // Chuẩn hóa góc theta về giới hạn [-PI, PI] (Quan trọng để ROS không bị lỗi)
-    if (odom_theta > PI) odom_theta -= 2.0f * PI;
-    if (odom_theta < -PI) odom_theta += 2.0f * PI;
-
-    odom_x += odom_vx * cos(odom_theta) * dt;
-    odom_y += odom_vx * sin(odom_theta) * dt;
+    // toc do goc w
 }
 
-// void respond()
-// {
-//     if (!robot.state.isResponseNew)
-//         return;
-//     HAL_UART_Transmit_DMA(&huart6, response.content, sizeof(response.content));
-// }
-
-void respond()
+// ham gui du lieu odometry ra UART cho pi
+void guiDuLieuPi()
 {
     // Định thời gửi dữ liệu mỗi 50ms (Tần số 20Hz)
-    static uint32_t last_send_time = 0;
-    if (HAL_GetTick() - last_send_time < 50) return;
-    last_send_time = HAL_GetTick();
+    if (HAL_GetTick() - thoiGianCuGui < 50) {
+        return;
+    }
+    thoiGianCuGui = HAL_GetTick();
 
     // Chuẩn bị mảng ký tự làm bộ đệm gửi (Buffer)
-    char tx_buffer[100]; 
+    char txBuffer[100];
     
-    // Đóng gói dữ liệu định dạng: x,y,theta,vx,vy,w\n
-    // Hàm snprintf rất an toàn vì không bao giờ ghi lố bộ nhớ
-    int len = snprintf(tx_buffer, sizeof(tx_buffer), "%.3f,%.3f,%.3f,%.3f,0.000,%.3f\n",
-                       odom_x, odom_y, odom_theta, odom_vx, odom_w);
+    // Đóng gói dữ liệu định dạng: odom_x,odom_y,odom_theta, odom_vx, odom_w
+    // snprint in ra moi chuoi duoc dinh dang
+    int doDaiGoi = snprintf(txBuffer, sizeof(txBuffer), "%.3f,%.3f,%.3f,%.3f,0.000,%.3f\n", // \n de ket thuc goi tin
+                                                        odom_x, odom_y, odom_theta, odom_vx, odom_w);
 
-    // Nếu format thành công, gửi qua UART
-    if (len > 0)
-    {
-        // Sử dụng hàm truyền của thư viện uartDriver bạn đã có
-        // uartDriver.transmit((uint8_t*)tx_buffer, len);
-        
+    // Gui du lieu neu dinh dang thanh cong
+    if (doDaiGoi > 0)
+    {        
         // Hoặc dùng trực tiếp HAL nếu thư viện trên lỗi:
-        HAL_UART_Transmit(&huart6, (uint8_t*)tx_buffer, len, 10);
+        HAL_UART_Transmit(&huart6, (uint8_t*)txBuffer, doDaiGoi, 10); // sau 10 ms khong gui het du lieu thi tat
     }
 }
