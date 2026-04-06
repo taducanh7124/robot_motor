@@ -14,8 +14,7 @@ motorControl rearLeftMotor;
 motorControl rearRightMotor;
 
 EncoderData_t encoderData;
-
-// PID_Controller_t pid_FL, pid_FR, pid_RL, pid_RR;
+dongCoPIO_t dongCoPID;
 
 uint8_t bufferUART[200];
 UartDma uartDriver;

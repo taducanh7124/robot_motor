@@ -43,7 +43,7 @@ void motorControl::control(uint16_t speed, MotorDir dir)
 {
   debug = speed;
     // kiem tra toc do
-    if (speed > 0 && speed <= this->ARR)
+    if (speed >= 0 && speed <= this->ARR)
     {
         // toc do hop le
         if (dir == MotorDir::Backward)

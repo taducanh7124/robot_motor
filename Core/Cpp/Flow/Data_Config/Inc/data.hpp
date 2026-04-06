@@ -6,7 +6,7 @@
 // thu vien nguoi dung
 #include "MotorControlPID.hpp"
 #include "uartDMA.hpp"
-
+#include "pid.h"
 // dieu lieu dieu khien nhan qua UART
 typedef struct
 {
@@ -45,6 +45,28 @@ typedef struct
     bool dir;
 } inputEncoder_t;
 
+
+typedef struct
+{
+    double vxSetpoint;
+    double vxInput;
+    double vxOutput;
+} dataDongCo_t;
+
+typedef struct
+{
+    PID dongCo1;
+    PID dongCo2;
+    PID dongCo3;
+    PID dongCo4;
+
+    // data
+    dataDongCo_t data_dongCo1;
+    dataDongCo_t data_dongCo2;
+    dataDongCo_t data_dongCo3;
+    dataDongCo_t data_dongCo4;
+} dongCoPIO_t;
+
 typedef struct
 {
     inputEncoder_t front_left;
@@ -53,27 +75,16 @@ typedef struct
     inputEncoder_t rear_right;
 } EncoderData_t;
 
-typedef struct {
-    float Kp, Ki, Kd;       // Các hệ số
-    float setpoint;         // Vận tốc mong muốn (xung/10ms)
-    float error_sum;        // Khâu tích phân (I) cộng dồn
-    float prev_error;       // Sai số quá khứ để tính Vi phân (D)
-    float out_max;          // Giới hạn PWM lớn nhất (VD: 1000)
-    float out_min;          // Giới hạn PWM nhỏ nhất (VD: -1000)
-} PID_Controller_t;
-
 
 // khai bao toan cuc
 extern RobotDrive_t robot;
 extern EncoderData_t encoderData;
-
+extern dongCoPIO_t dongCoPID;
 extern motorControl frontLeftMotor;
 extern motorControl frontRightMotor;
 extern motorControl rearLeftMotor;
 extern motorControl rearRightMotor;
 
-// // Khai báo 4 bộ PID cho 4 bánh
-// extern PID_Controller_t pid_FL, pid_FR, pid_RL, pid_RR;
 
 // buffer nhan UART
 extern uint8_t bufferUART[200];

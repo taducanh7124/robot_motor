@@ -6,16 +6,16 @@
 // thu vien phan cung
 #include "main.h"
 #include "dma.h"
-#include "iwdg.h"
+// #include "iwdg.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
 #include "input.hpp"
- #include "output.hpp"
-//#include "odometry.hpp"
+#include "output.hpp"
 #include "ledmain.hpp"
-#include "PID_v1.h"
+#include "pid.h"
+#include "QMC5883LCompass.h"
 
 // data
 #include "data.hpp"

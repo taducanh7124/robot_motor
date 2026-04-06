@@ -1236,7 +1236,7 @@
                         <name>$PROJ_DIR$\..\Core\Cpp\Library\Src\MotorControlPID.cpp</name>
                     </file>
                     <file>
-                        <name>$PROJ_DIR$\..\Core\Cpp\Library\Src\PID_v1.cpp</name>
+                        <name>$PROJ_DIR$\..\Core\Cpp\Library\Src\pid.cpp</name>
                     </file>
                     <file>
                         <name>$PROJ_DIR$\..\Core\Cpp\Library\Src\QMC5883LCompass.cpp</name>
