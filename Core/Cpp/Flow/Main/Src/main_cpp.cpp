@@ -23,14 +23,17 @@ double setpoint_pos_front_right = 0.0; // Vị trí mục tiêu (mét)
 double setpoint_pos_rear_left = 0.0;   // Vị trí mục tiêu (mét)
 double setpoint_pos_rear_right = 0.0;  // Vị trí mục tiêu (mét)
 
-PID posPID_FrontLeft(&input_pos_front_left, &output_pwm_front_left, &setpoint_pos_front_left, 150.0, 5.0, 10.0, DIRECT);
+// PID posPID_FrontLeft(&input_pos_front_left, &output_pwm_front_left, &setpoint_pos_front_left, 150.0, 5.0, 10.0, DIRECT);
 PID posPID_FrontRight(&input_pos_front_right, &output_pwm_front_right, &setpoint_pos_front_right, 150.0, 5.0, 10.0, DIRECT);
 PID posPID_RearLeft(&input_pos_rear_left, &output_pwm_rear_left, &setpoint_pos_rear_left, 150.0, 5.0, 10.0, DIRECT);
 PID posPID_RearRight(&input_pos_rear_right, &output_pwm_rear_right, &setpoint_pos_rear_right, 150.0, 5.0, 10.0, DIRECT);
 
+double kp = 15, ki = 5, kd = 10;
+PID posPID_FrontLeft(&input_pos_front_left, &output_pwm_front_left, &setpoint_pos_front_left, kp, ki, kd, DIRECT);
+
 QMC5883LCompass compass;
 
-void setup()
+void setupPID()
 {
     posPID_FrontLeft.SetMode(AUTOMATIC);
     posPID_FrontLeft.SetOutputLimits(-MAX_PWM_ARR, MAX_PWM_ARR);
@@ -72,65 +75,129 @@ void setup()
 // }
 
 // di chuyen theo toa do
+// void Robot_Control_Loop()
+// {
+//     static int16_t prev_FL = 0, prev_FR = 0, prev_RL = 0, prev_RR = 0;
+//     if (robot.state.isControlNew)
+//     {
+//         robot.state.isControlNew = false;
+//         // ben trai dao chieu
+//         setpoint_pos_front_left = robot.front_left.setpoint;
+//         setpoint_pos_front_right = robot.front_right.setpoint;
+//         setpoint_pos_rear_left = robot.rear_left.setpoint;
+//         setpoint_pos_rear_right = robot.rear_right.setpoint;
+//     }
+//     else
+//     {
+//     }
+
+//     uint16_t current_FR = __HAL_TIM_GET_COUNTER(&htim2);
+//     uint16_t current_RR = __HAL_TIM_GET_COUNTER(&htim3);
+//     uint16_t current_RL = __HAL_TIM_GET_COUNTER(&htim4);
+//     uint16_t current_FL = __HAL_TIM_GET_COUNTER(&htim1);
+
+//     // robot.front_left.velocity = (int16_t)(current_FL - prev_FL);
+//     // robot.front_right.velocity = (int16_t)(current_FR - prev_FR);
+//     // robot.rear_left.velocity = (int16_t)(current_RL - prev_RL);
+//     // robot.rear_right.velocity = (int16_t)(current_RR - prev_RR);
+
+//     robot.front_left.velocity = (int16_t)((int16_t)prev_FL - (int16_t)current_FL);
+//     robot.front_right.velocity = (int16_t)((int16_t)prev_FR - (int16_t)current_FR);
+//     robot.rear_left.velocity = (int16_t)((int16_t)prev_RL - (int16_t)current_RL);
+//     robot.rear_right.velocity = (int16_t)((int16_t)prev_RR - (int32_t)current_RR);
+
+//     // input_pos_front_left = (double)(encoderData.front_left.encoderValue) * METERS_PER_PULSE;
+//     // input_pos_front_right = (double)(encoderData.front_right.encoderValue) * METERS_PER_PULSE;
+//     // input_pos_rear_left = (double)(encoderData.rear_left.encoderValue) * METERS_PER_PULSE;
+//     // input_pos_rear_right = (double)(encoderData.rear_right.encoderValue) * METERS_PER_PULSE;
+
+//     int16_t delta_FL = (int16_t)(current_FL - prev_FL);
+//     int16_t delta_FR = (int16_t)(current_FR - prev_FR);
+//     int16_t delta_RL = (int16_t)(current_RL - prev_RL);
+//     int16_t delta_RR = (int16_t)(current_RR - prev_RR);
+
+//     prev_FL = current_FL;
+//     prev_FR = current_FR;
+//     prev_RL = current_RL;
+//     prev_RR = current_RR;
+
+//     // Công thức: v = (xung * quy_đổi) / thời_gian
+//     input_pos_front_left = ((double)delta_FL * METERS_PER_PULSE) / DELTA_T;
+//     input_pos_front_right = ((double)delta_FR * METERS_PER_PULSE) / DELTA_T;
+//     input_pos_rear_left = ((double)delta_RL * METERS_PER_PULSE) / DELTA_T;
+//     input_pos_rear_right = ((double)delta_RR * METERS_PER_PULSE) / DELTA_T;
+
+//     if (posPID_FrontLeft.Compute())
+//     {
+//          uint16_t left_pwm = (uint16_t)fabs(output_pwm_front_left);
+//         MotorDir dir = (output_pwm_front_left >= 0) ? MotorDir::Forward : MotorDir::Backward;
+//         frontLeftMotor.control(left_pwm, dir);
+//     }
+
+//     if (posPID_FrontRight.Compute())
+//     {
+//          uint16_t right_pwm = (uint16_t)fabs(output_pwm_front_right);
+//         MotorDir dir = (output_pwm_front_right >= 0) ? MotorDir::Forward : MotorDir::Backward;
+//         frontRightMotor.control(right_pwm, dir);
+//     }
+
+//     if (posPID_RearLeft.Compute())
+//     {
+//         uint16_t left_pwm = (uint16_t)fabs(output_pwm_rear_left);
+//         MotorDir dir = (output_pwm_rear_left >= 0) ? MotorDir::Forward : MotorDir::Backward;
+//         rearLeftMotor.control(left_pwm, dir);
+//     }
+
+//     if (posPID_RearRight.Compute())
+//     {
+//         uint16_t right_pwm = (uint16_t)fabs(output_pwm_rear_right);
+//         MotorDir dir = (output_pwm_rear_right >= 0) ? MotorDir::Forward : MotorDir::Backward;
+//         rearRightMotor.control(right_pwm, dir);
+//     }
+// }
+
 void Robot_Control_Loop()
 {
     static int16_t prev_FL = 0, prev_FR = 0, prev_RL = 0, prev_RR = 0;
 
-    static uint32_t last_time = 0;
-    if (HAL_GetTick() - last_time < 10)
-    {
-        return;
-    }
-    last_time = HAL_GetTick();
-
     if (robot.state.isControlNew)
     {
         robot.state.isControlNew = false;
-        // ben trai dao chieu
         setpoint_pos_front_left = robot.front_left.setpoint;
         setpoint_pos_front_right = robot.front_right.setpoint;
         setpoint_pos_rear_left = robot.rear_left.setpoint;
         setpoint_pos_rear_right = robot.rear_right.setpoint;
     }
-    else
-    {
-    }
 
-    uint16_t current_FL = __HAL_TIM_GET_COUNTER(&htim1);
     uint16_t current_FR = __HAL_TIM_GET_COUNTER(&htim2);
     uint16_t current_RR = __HAL_TIM_GET_COUNTER(&htim3);
     uint16_t current_RL = __HAL_TIM_GET_COUNTER(&htim4);
+    uint16_t current_FL = __HAL_TIM_GET_COUNTER(&htim1);
 
-    // robot.front_left.velocity = (int16_t)(current_FL - prev_FL);
-    // robot.front_right.velocity = (int16_t)(current_FR - prev_FR);
-    // robot.rear_left.velocity = (int16_t)(current_RL - prev_RL);
-    // robot.rear_right.velocity = (int16_t)(current_RR - prev_RR);
-
-    robot.front_left.velocity = (int16_t)((int16_t)prev_FL - (int16_t)current_FL);
-    robot.front_right.velocity = (int16_t)((int16_t)prev_FR - (int16_t)current_FR);
-    robot.rear_left.velocity = (int16_t)((int16_t)prev_RL - (int16_t)current_RL);
-    robot.rear_right.velocity = (int16_t)((int16_t)prev_RR - (int32_t)current_RR);
-
-    // input_pos_front_left = (double)(encoderData.front_left.encoderValue) * METERS_PER_PULSE;
-    // input_pos_front_right = (double)(encoderData.front_right.encoderValue) * METERS_PER_PULSE;
-    // input_pos_rear_left = (double)(encoderData.rear_left.encoderValue) * METERS_PER_PULSE;
-    // input_pos_rear_right = (double)(encoderData.rear_right.encoderValue) * METERS_PER_PULSE;
-
+    // Tính delta dựa trên mốc prev của 10ms trước đó
     int16_t delta_FL = (int16_t)(current_FL - prev_FL);
     int16_t delta_FR = (int16_t)(current_FR - prev_FR);
     int16_t delta_RL = (int16_t)(current_RL - prev_RL);
     int16_t delta_RR = (int16_t)(current_RR - prev_RR);
+
+    // XÓA 4 DÒNG prev = current Ở ĐÂY! Không được để ở ngoài này.
+
+    // Công thức: v = (xung * quy_đổi) / thời_gian
+    // input_pos_front_left = ((double)delta_FL * METERS_PER_PULSE) / DELTA_T;
+    // input_pos_front_right = ((double)delta_FR * METERS_PER_PULSE) / DELTA_T;
+    // input_pos_rear_left = ((double)delta_RL * METERS_PER_PULSE) / DELTA_T;
+    // input_pos_rear_right = ((double)delta_RR * METERS_PER_PULSE) / DELTA_T;
+    input_pos_front_left = __HAL_TIM_GET_COUNTER(&htim1);
+    input_pos_front_right = __HAL_TIM_GET_COUNTER(&htim2);
+    input_pos_rear_left = __HAL_TIM_GET_COUNTER(&htim4);
+    input_pos_rear_right = __HAL_TIM_GET_COUNTER(&htim3);
 
     prev_FL = current_FL;
     prev_FR = current_FR;
     prev_RL = current_RL;
     prev_RR = current_RR;
 
-    // Công thức: v = (xung * quy_đổi) / thời_gian
-    input_pos_front_left = ((double)delta_FL * METERS_PER_PULSE) / DELTA_T;
-    input_pos_front_right = ((double)delta_FR * METERS_PER_PULSE) / DELTA_T;
-    input_pos_rear_left = ((double)delta_RL * METERS_PER_PULSE) / DELTA_T;
-    input_pos_rear_right = ((double)delta_RR * METERS_PER_PULSE) / DELTA_T;
+    // --- CẬP NHẬT PID VÀ CHỐT ENCODER ---
 
     if (posPID_FrontLeft.Compute())
     {
@@ -159,8 +226,6 @@ void Robot_Control_Loop()
         MotorDir dir = (output_pwm_rear_right >= 0) ? MotorDir::Forward : MotorDir::Backward;
         rearRightMotor.control(right_pwm, dir);
     }
-
-    CalculateOdometry();
 }
 
 // // di chuyen theo van toc
@@ -179,6 +244,10 @@ void Robot_Control_Loop()
 //     {
 //     }
 // }
+uint16_t left_pwm, right_pwm;
+MotorDir left_dir;
+MotorDir right_dir;
+uint8_t khoiDong = false;
 
 void main_cpp()
 {
@@ -211,8 +280,11 @@ void main_cpp()
     LED_MAIN_GPIO_Port->ODR ^= LED_MAIN_Pin;
     HAL_Delay(300);
 
-    compass.calibrate();
+   // compass.calibrate();
     MX_IWDG_Init();
+    int16_t encLastTime = 0;
+
+    setupPID();
     // VÒNG LẶP CHÍNH
     while (1)
     {
@@ -233,7 +305,17 @@ void main_cpp()
 
         // phan hoi (neu can)
         // respond();
-        configPID();
+        //        configPID();
+
+        if (khoiDong == 1)
+        {
+            khoiDong = 0;
+            //            frontLeftMotor.control(left_pwm, left_dir);
+            //            rearLeftMotor.control(left_pwm, left_dir);
+            //
+            //            rearRightMotor.control(right_pwm, right_dir);
+            //            frontRightMotor.control(right_pwm, right_dir);
+        }
 
         // Làm tươi Watchdog
         HAL_IWDG_Refresh(&hiwdg);

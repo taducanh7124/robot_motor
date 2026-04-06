@@ -12,15 +12,15 @@
         <ByteLimit>50</ByteLimit>
     </Stack>
     <StLinkDriver>
+        <stlinkserialNo>7691EF01</stlinkserialNo>
+        <stlinkfoundProbes />
         <CStepIntDis>_ 0</CStepIntDis>
         <LeaveTargetRunning>_ 0</LeaveTargetRunning>
         <stlinkResetStyle>0</stlinkResetStyle>
         <stlinkResetStrategy>2</stlinkResetStrategy>
-        <stlinkserialNo>7691EF01</stlinkserialNo>
-        <stlinkfoundProbes />
     </StLinkDriver>
     <DebugChecksum>
-        <Checksum>2493767073</Checksum>
+        <Checksum>2406895910</Checksum>
     </DebugChecksum>
     <Exceptions>
         <StopOnUncaught>_ 0</StopOnUncaught>
@@ -62,10 +62,11 @@
         <Fmt2>{W}42:encoderDirection_FR	3	0</Fmt2>
         <Fmt3>{W}42:encoderDirection_RL	3	0</Fmt3>
         <Fmt4>{W}42:encoderDirection_RR	3	0</Fmt4>
-        <Fmt5>{W}42:motor	3	0</Fmt5>
-        <Fmt6>{W}42:robot.state.isDataNew	3	0</Fmt6>
-        <Fmt7>{W}42:speed	3	0</Fmt7>
-        <Fmt8>{W}42:test	3	0</Fmt8>
+        <Fmt5>{W}42:khoiDong	3	0</Fmt5>
+        <Fmt6>{W}42:motor	3	0</Fmt6>
+        <Fmt7>{W}42:robot.state.isDataNew	3	0</Fmt7>
+        <Fmt8>{W}42:speed	3	0</Fmt8>
+        <Fmt9>{W}42:test	3	0</Fmt9>
     </watch_formats>
     <Trace2>
         <Enabled>0</Enabled>
@@ -116,8 +117,13 @@
         <mode>0</mode>
     </DisassembleMode>
     <Breakpoints2>
-        <Count>0</Count>
+        <Bp0>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\Core\Src\main.c}.103.3" 0 0 1 "" 0 "" 0</Bp0>
+        <Count>1</Count>
     </Breakpoints2>
+    <TermIOLog>
+        <LoggingEnabled>_ 0</LoggingEnabled>
+        <LogFile>_ ""</LogFile>
+    </TermIOLog>
     <LogFile>
         <LoggingEnabled>_ 0</LoggingEnabled>
         <LogFile>_ ""</LogFile>
@@ -140,8 +146,4 @@
     <CallStackStripe>
         <ShowTiming>1</ShowTiming>
     </CallStackStripe>
-    <TermIOLog>
-        <LoggingEnabled>_ 0</LoggingEnabled>
-        <LogFile>_ ""</LogFile>
-    </TermIOLog>
 </settings>

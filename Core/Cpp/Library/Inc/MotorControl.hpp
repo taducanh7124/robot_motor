@@ -24,6 +24,7 @@ private:
 
     GPIO_TypeDef *dirPort;
     uint16_t dirPin;
+    uint16_t debug;
 
 public:
     void init(TIM_HandleTypeDef *htim, uint32_t timerChanel, GPIO_TypeDef* dirPort, uint16_t dirPin);

@@ -4,8 +4,6 @@
 
 class PID
 {
-
-
   public:
 
   //Constants used in some of the functions below
@@ -36,7 +34,6 @@ class PID
 										                      //   the application
 	
 
-
   //available but not commonly used functions ********************************************************
     void SetTunings(double, double,       // * While most users will set the tunings once in the 
                     double);         	    //   constructor, this function gives the user the option
@@ -51,8 +48,7 @@ class PID
     void SetSampleTime(int);              // * sets the frequency, in Milliseconds, with which 
                                           //   the PID calculation is performed.  default is 100
 										  
-										  
-										  
+										  	  
   //Display functions ****************************************************************
 	double GetKp();						  // These functions query the pid for interal values.
 	double GetKi();						  //  they were created mainly for the pid front-end,
@@ -87,4 +83,3 @@ class PID
 	bool inAuto, pOnE;
 };
 #endif
-

@@ -41,19 +41,20 @@ void motorControl::init(TIM_HandleTypeDef *htim, uint32_t timerChanel, GPIO_Type
 
 void motorControl::control(uint16_t speed, MotorDir dir)
 {
+  debug = speed;
     // kiem tra toc do
-    if (speed >= 0 && speed <= this->ARR)
+    if (speed > 0 && speed <= this->ARR)
     {
         // toc do hop le
         if (dir == MotorDir::Backward)
         {
             // chay tien
-            this->dir.high(); // Set bit để bật
+            this->dir.low(); // Set bit để bật
         }
         else if (dir == MotorDir::Forward)
         {
             // chay lui
-            this->dir.low(); // Set bit để tắt
+            this->dir.high(); // Set bit để tắt
         }
 
         // toc do PWM

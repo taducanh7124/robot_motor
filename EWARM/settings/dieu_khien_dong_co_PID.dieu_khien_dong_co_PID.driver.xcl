@@ -6,7 +6,7 @@
 
 "-p" 
 
-"C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.3\arm\CONFIG\debugger\ST\STM32F401CC.ddf" 
+"C:\Users\taduc\Downloads\IAR Systems\IAR Systems\Embedded Workbench 8.3\arm\CONFIG\debugger\ST\STM32F401CC.ddf" 
 
 "--drv_verify_download" 
 

@@ -25,7 +25,7 @@ if not "%~1" == "" goto debugFile
 
 @echo on 
 
-"C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.3\common\bin\cspybat" -f "G:\internship\DO_AN\dong_co_f4\dieu_khien_dong_co_PID\EWARM\settings\dieu_khien_dong_co_PID.dieu_khien_dong_co_PID.general.xcl" --backend -f "G:\internship\DO_AN\dong_co_f4\dieu_khien_dong_co_PID\EWARM\settings\dieu_khien_dong_co_PID.dieu_khien_dong_co_PID.driver.xcl" 
+"C:\Users\taduc\Downloads\IAR Systems\IAR Systems\Embedded Workbench 8.3\common\bin\cspybat" -f "C:\Users\taduc\Downloads\do_an_tot_nghiep-master\do_an_tot_nghiep-master\EWARM\settings\dieu_khien_dong_co_PID.dieu_khien_dong_co_PID.general.xcl" --backend -f "C:\Users\taduc\Downloads\do_an_tot_nghiep-master\do_an_tot_nghiep-master\EWARM\settings\dieu_khien_dong_co_PID.dieu_khien_dong_co_PID.driver.xcl" 
 
 @echo off 
 goto end 
@@ -34,7 +34,7 @@ goto end
 
 @echo on 
 
-"C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.3\common\bin\cspybat" -f "G:\internship\DO_AN\dong_co_f4\dieu_khien_dong_co_PID\EWARM\settings\dieu_khien_dong_co_PID.dieu_khien_dong_co_PID.general.xcl" "--debug_file=%~1" --backend -f "G:\internship\DO_AN\dong_co_f4\dieu_khien_dong_co_PID\EWARM\settings\dieu_khien_dong_co_PID.dieu_khien_dong_co_PID.driver.xcl" 
+"C:\Users\taduc\Downloads\IAR Systems\IAR Systems\Embedded Workbench 8.3\common\bin\cspybat" -f "C:\Users\taduc\Downloads\do_an_tot_nghiep-master\do_an_tot_nghiep-master\EWARM\settings\dieu_khien_dong_co_PID.dieu_khien_dong_co_PID.general.xcl" "--debug_file=%~1" --backend -f "C:\Users\taduc\Downloads\do_an_tot_nghiep-master\do_an_tot_nghiep-master\EWARM\settings\dieu_khien_dong_co_PID.dieu_khien_dong_co_PID.driver.xcl" 
 
 @echo off 
 :end
