@@ -1204,6 +1204,9 @@
                     <name>$PROJ_DIR$\..\Core\Src\gpio.c</name>
                 </file>
                 <file>
+                    <name>$PROJ_DIR$\..\Core\Src\i2c.c</name>
+                </file>
+                <file>
                     <name>$PROJ_DIR$\..\Core\Src\iwdg.c</name>
                 </file>
                 <file>
@@ -1227,10 +1230,16 @@
                 <group>
                     <name>Library</name>
                     <file>
+                        <name>$PROJ_DIR$\..\Core\Cpp\Library\Src\i2c_software.cpp</name>
+                    </file>
+                    <file>
                         <name>$PROJ_DIR$\..\Core\Cpp\Library\Src\MotorControl.cpp</name>
                     </file>
                     <file>
                         <name>$PROJ_DIR$\..\Core\Cpp\Library\Src\MotorControlPID.cpp</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\Core\Cpp\Library\Src\QMC5883LCompass.cpp</name>
                     </file>
                     <file>
                         <name>$PROJ_DIR$\..\Core\Cpp\Library\Src\uartDMA.cpp</name>
@@ -1290,6 +1299,12 @@
             </file>
             <file>
                 <name>$PROJ_DIR$\..\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_gpio.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_i2c.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_i2c_ex.c</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\..\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_iwdg.c</name>

@@ -8,10 +8,10 @@ RobotDrive_t robot = {
 };
 
 // khai bao
-MotorControlPID frontLeftMotor;
-MotorControlPID frontRightMotor;
-MotorControlPID rearLeftMotor;
-MotorControlPID rearRightMotor;
+motorControl frontLeftMotor;
+motorControl frontRightMotor;
+motorControl rearLeftMotor;
+motorControl rearRightMotor;
 
 EncoderData_t encoderData;
 

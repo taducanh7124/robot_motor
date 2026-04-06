@@ -1,19 +1,20 @@
 #ifndef QMC5883L_Compass
 #define QMC5883L_Compass
 
-#include "Arduino.h"
-#include "Wire.h"
+#include "config.hpp"
+#include "i2c_software.hpp"
+#include "math.h"
 
 
 class QMC5883LCompass{
 	
   public:
     QMC5883LCompass();
-	void init();
-    void setADDR(byte b);
-    void setMode(byte mode, byte odr, byte rng, byte osr);
+	void init(GPIO_TypeDef *scl_port, uint16_t scl_pin, GPIO_TypeDef *sda_port, uint16_t sda_pin);
+    void setADDR(uint8_t b);
+    void setMode(uint8_t mode, uint8_t odr, uint8_t rng, uint8_t osr);
 	void setMagneticDeclination(int degrees, uint8_t minutes);
-	void setSmoothing(byte steps, bool adv);
+	void setSmoothing(uint8_t steps, bool adv);
 	void calibrate();
 	void setCalibration(int x_min, int x_max, int y_min, int y_max, int z_min, int z_max);
 	void setCalibrationOffsets(float x_offset, float y_offset, float z_offset);
@@ -27,17 +28,17 @@ class QMC5883LCompass{
 	int getY();
 	int getZ();
 	int getAzimuth();
-	byte getBearing(int azimuth);
+	uint8_t getBearing(int azimuth);
 	void getDirection(char* myArray, int azimuth);
 
   private:
-    void _writeReg(byte reg,byte val);
+    void _writeReg(uint8_t reg,uint8_t val);
 	int _get(int index);
 	float _magneticDeclinationDegrees = 0;
 	bool _smoothUse = false;
-	byte _smoothSteps = 5;
+	uint8_t _smoothSteps = 5;
 	bool _smoothAdvanced = false;
-    byte _ADDR = 0x0D;
+    uint8_t _ADDR = 0x0D;
 	int _vRaw[3] = {0,0,0};
 	int _vHistory[10][3];
 	int _vScan = 0;
@@ -67,7 +68,7 @@ class QMC5883LCompass{
 		{'N', 'N', 'W'},
 	};
 	
-	
+	I2C_software I2C;
 	
 };
 

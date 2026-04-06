@@ -95,6 +95,10 @@ void Error_Handler(void);
 #define A4_GPIO_Port GPIOB
 #define B4_Pin GPIO_PIN_7
 #define B4_GPIO_Port GPIOB
+#define SDA_Pin GPIO_PIN_8
+#define SDA_GPIO_Port GPIOB
+#define SCL_Pin GPIO_PIN_9
+#define SCL_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 
