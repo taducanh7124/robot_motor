@@ -1,88 +1,57 @@
-// #include "main_cpp.hpp"
-// #include "config.hpp"
+#include "main_cpp.hpp"
+#include "config.hpp"
+#include "math.h"
+#include "QMC5883LCompass.h"
 
-// // void motorControl()
-// // {
-// //     if (robot.state.isControlNew)
-// //     {
-// //         robot.state.isControlNew = false;
-// //         frontLeftMotor.control(robot.front_left.pwm, (MotorDir)robot.front_left.dir);
-// //         frontRightMotor.control(robot.front_right.pwm, (MotorDir)robot.front_right.dir);
-// //         rearLeftMotor.control(robot.rear_left.pwm, (MotorDir)robot.rear_left.dir);
-// //         rearRightMotor.control(robot.rear_right.pwm, (MotorDir)robot.rear_right.dir);
-// //     }
-// //     else
-// //     {
-// //     }
-// // }
+#define MAX_PWM_ARR 255
+#define WHEEL_BASE 0.03 // Khoảng cách giữa 2 bánh xe trái-phải (tính bằng mét, thay bằng thông số thực)
+#define METERS_PER_PULSE 0.0006
+#define DELTA_T 0.01 // 10ms
 
-// // void test()
-// // {
-// //     struct
-// //     {
-// //         PinConfig_out d1, d2, d3, d4;
-// //     } dri_t;
+double input_pos_front_left = 0.0;  // Vị trí hiện tại (mét)
+double input_pos_front_right = 0.0; // Vị trí hiện tại (mét)
+double input_pos_rear_left = 0.0;   // Vị trí hiện tại (mét)
+double input_pos_rear_right = 0.0;  // Vị trí hiện tại (mét)
 
-// //     while (1)
-// //     {
-// //         static uint32_t timeCurent = 0;
-// //         if (HAL_GetTick() - timeCurent >= 1000)
-// //         {
-// //             timeCurent = HAL_GetTick();
-// //             dri_t.d1.high();
-// //             dri_t.d2.high();
-// //             dri_t.d3.high();
-// //             dri_t.d4.high();
-// //             HAL_Delay(100);
-// //             dri_t.d1.low();
-// //             dri_t.d2.low();
-// //             dri_t.d3.low();
-// //             dri_t.d4.low();
+double output_pwm_front_left = 0.0;  // Giá trị PWM xuất ra (-ARR đến +ARR)
+double output_pwm_front_right = 0.0; // Giá trị PWM xuất ra (-ARR đến +ARR)
+double output_pwm_rear_left = 0.0;   // Giá trị PWM xuất ra (-ARR đến +ARR)
+double output_pwm_rear_right = 0.0;  // Giá trị PWM xuất ra (-ARR đến +ARR)
 
-// //             HAL_IWDG_Refresh(&hiwdg);
-// //         }
-// //     }
-// // }
+double setpoint_pos_front_left = 0.0;  // Vị trí mục tiêu (mét)
+double setpoint_pos_front_right = 0.0; // Vị trí mục tiêu (mét)
+double setpoint_pos_rear_left = 0.0;   // Vị trí mục tiêu (mét)
+double setpoint_pos_rear_right = 0.0;  // Vị trí mục tiêu (mét)
 
-// void vanToc()
-// {
-//     // 1. ĐỊNH THỜI: Đảm bảo hàm chỉ tính toán mỗi 10ms
-//     static uint32_t last_time = 0;
-//     if (HAL_GetTick() - last_time < 10)
-//     {
-//         return; // Nếu chưa đủ 10ms thì thoát hàm ngay lập tức
-//     }
-//     last_time = HAL_GetTick(); // Cập nhật lại mốc thời gian
+PID posPID_FrontLeft(&input_pos_front_left, &output_pwm_front_left, &setpoint_pos_front_left, 150.0, 5.0, 10.0, DIRECT);
+PID posPID_FrontRight(&input_pos_front_right, &output_pwm_front_right, &setpoint_pos_front_right, 150.0, 5.0, 10.0, DIRECT);
+PID posPID_RearLeft(&input_pos_rear_left, &output_pwm_rear_left, &setpoint_pos_rear_left, 150.0, 5.0, 10.0, DIRECT);
+PID posPID_RearRight(&input_pos_rear_right, &output_pwm_rear_right, &setpoint_pos_rear_right, 150.0, 5.0, 10.0, DIRECT);
 
-//     // 2. KHAI BÁO BIẾN LƯU QUÁ KHỨ CHO 4 BÁNH
-//     static uint16_t prev_encoder_FL = 0;
-//     static uint16_t prev_encoder_FR = 0;
-//     static uint16_t prev_encoder_RL = 0;
-//     static uint16_t prev_encoder_RR = 0;
+QMC5883LCompass compass;
 
-//     // 3. ĐỌC GIÁ TRỊ HIỆN TẠI (Ép kiểu 16-bit)
-//     uint16_t current_FL = (uint16_t)encoderData.front_left.encoderValue;
-//     uint16_t current_FR = (uint16_t)encoderData.front_right.encoderValue;
-//     uint16_t current_RL = (uint16_t)encoderData.rear_left.encoderValue;
-//     uint16_t current_RR = (uint16_t)encoderData.rear_right.encoderValue;
+void setup()
+{
+    posPID_FrontLeft.SetMode(AUTOMATIC);
+    posPID_FrontLeft.SetOutputLimits(-MAX_PWM_ARR, MAX_PWM_ARR);
+    posPID_FrontLeft.SetSampleTime(10); // 10ms
 
-//     // 4. TÍNH DELTA VÀ LƯU VÀO STRUCT TOÀN CỤC (Để PID còn gọi ra dùng)
-//     // Đơn vị lúc này chuẩn xác là: Số xung / 10ms
-//     robot.front_left.velocity  = (int16_t)(current_FL - prev_encoder_FL);
-//     robot.front_right.velocity = (int16_t)(current_FR - prev_encoder_FR);
-//     robot.rear_left.velocity   = (int16_t)(current_RL - prev_encoder_RL);
-//     robot.rear_right.velocity  = (int16_t)(current_RR - prev_encoder_RR);
+    posPID_FrontRight.SetMode(AUTOMATIC);
+    posPID_FrontRight.SetOutputLimits(-MAX_PWM_ARR, MAX_PWM_ARR);
+    posPID_FrontRight.SetSampleTime(10); // 10ms
 
-//     // 5. CẬP NHẬT LẠI QUÁ KHỨ CHO CHU KỲ SAU
-//     prev_encoder_FL = current_FL;
-//     prev_encoder_FR = current_FR;
-//     prev_encoder_RL = current_RL;
-//     prev_encoder_RR = current_RR;
-// }
+    posPID_RearLeft.SetMode(AUTOMATIC);
+    posPID_RearLeft.SetOutputLimits(-MAX_PWM_ARR, MAX_PWM_ARR);
+    posPID_RearLeft.SetSampleTime(10); // 10ms
 
+    posPID_RearRight.SetMode(AUTOMATIC);
+    posPID_RearRight.SetOutputLimits(-MAX_PWM_ARR, MAX_PWM_ARR);
+    posPID_RearRight.SetSampleTime(10); // 10ms
+}
+
+// debug
 // void encoder()
 // {
-
 //     // cap nhat moi 1ms
 //     if (HAL_GetTick() % 1 == 0)
 //     {
@@ -91,9 +60,6 @@
 //     {
 //         return;
 //     }
-
-//     robot.state.isDataNew = true;
-
 //     encoderData.front_left.encoderValue = __HAL_TIM_GET_COUNTER(&htim1);
 //     encoderData.front_right.encoderValue = __HAL_TIM_GET_COUNTER(&htim2);
 //     encoderData.rear_left.encoderValue = __HAL_TIM_GET_COUNTER(&htim3);
@@ -105,241 +71,35 @@
 //     encoderData.rear_right.dir = TIM4->CR1 & TIM_CR1_DIR ? 1 : 0;
 // }
 
-// #include "math.h" // Dùng cho hàm fabs() nếu cần thiết
-
-// void Robot_Control_Loop()
-// {
-//     // 1. Cập nhật vận tốc thực tế của 4 bánh
-//     vanToc();
-
-//     // 2. Cài đặt vận tốc mong muốn (Setpoint)
-//     // Ví dụ: Đặt cả 4 bánh chạy với tốc độ 30 xung/10ms
-//     pid_FL.setpoint = 30;
-//     pid_FR.setpoint = 30;
-//     pid_RL.setpoint = 30;
-//     pid_RR.setpoint = 30;
-
-//     // 3. Tính toán ngõ ra PID cho từng bánh
-//     // Gọi phương thức PID_Compute từ từng object motor tương ứng
-//     float out_FL = frontLeftMotor.PID_Compute(&pid_FL, robot.front_left.velocity);
-//     float out_FR = frontRightMotor.PID_Compute(&pid_FR, robot.front_right.velocity);
-//     float out_RL = rearLeftMotor.PID_Compute(&pid_RL, robot.rear_left.velocity);
-//     float out_RR = rearRightMotor.PID_Compute(&pid_RR, robot.rear_right.velocity);
-
-//     // 4. Băm xung và điều khiển phần cứng qua hàm control()
-//     // Tách dấu để quyết định chiều quay, ép kiểu độ lớn thành uint16_t
-
-//     // --- BÁNH TRÁI TRƯỚC (Front Left) ---
-//     if (out_FL >= 0) {
-//         frontLeftMotor.control((uint16_t)out_FL, MotorDir::Forward);
-//     } else {
-//         frontLeftMotor.control((uint16_t)(-out_FL), MotorDir::Backward);
-//     }
-
-//     // --- BÁNH PHẢI TRƯỚC (Front Right) ---
-//     if (out_FR >= 0) {
-//         frontRightMotor.control((uint16_t)out_FR, MotorDir::Forward);
-//     } else {
-//         frontRightMotor.control((uint16_t)(-out_FR), MotorDir::Backward);
-//     }
-
-//     // --- BÁNH TRÁI SAU (Rear Left) ---
-//     if (out_RL >= 0) {
-//         rearLeftMotor.control((uint16_t)out_RL, MotorDir::Forward);
-//     } else {
-//         rearLeftMotor.control((uint16_t)(-out_RL), MotorDir::Backward);
-//     }
-
-//     // --- BÁNH PHẢI SAU (Rear Right) ---
-//     if (out_RR >= 0) {
-//         rearRightMotor.control((uint16_t)out_RR, MotorDir::Forward);
-//     } else {
-//         rearRightMotor.control((uint16_t)(-out_RR), MotorDir::Backward);
-//     }
-// }
-
-// void main_cpp()
-// {
-//     HAL_TIM_Encoder_Start(&htim1, TIM_CHANNEL_1 | TIM_CHANNEL_2);
-//     HAL_TIM_Encoder_Start(&htim2, TIM_CHANNEL_1 | TIM_CHANNEL_2);
-//     HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_1 | TIM_CHANNEL_2);
-//     HAL_TIM_Encoder_Start(&htim4, TIM_CHANNEL_1 | TIM_CHANNEL_2);
-
-//     HAL_TIM_PWM_Start(&htim5, TIM_CHANNEL_1 | TIM_CHANNEL_2 | TIM_CHANNEL_3 | TIM_CHANNEL_4);
-
-// // PID = 0;
-
-//     frontLeftMotor.initPID(&htim5, TIM_CHANNEL_1, DIR1_GPIO_Port, DIR1_Pin, 0, 0, 0, 1000);
-//     frontRightMotor.initPID(&htim5, TIM_CHANNEL_2, DIR2_GPIO_Port, DIR2_Pin, 0, 0, 0, 1000);
-//     rearLeftMotor.initPID(&htim5, TIM_CHANNEL_3, DIR3_GPIO_Port, DIR3_Pin, 0, 0, 0, 1000);
-//     rearRightMotor.initPID(&htim5, TIM_CHANNEL_4, DIR4_GPIO_Port, DIR4_Pin, 0, 0, 0, 1000);
-
-//     // frontLeftMotor.init(&htim3, TIM_CHANNEL_1, DIR_1_GPIO_Port, DIR_1_Pin);
-//     // frontRightMotor.init(&htim3, TIM_CHANNEL_2, DIR_2_GPIO_Port, DIR_2_Pin);
-//     // rearLeftMotor.init(&htim3, TIM_CHANNEL_3, DIR_3_GPIO_Port, DIR_3_Pin);
-//     // rearRightMotor.init(&htim3, TIM_CHANNEL_4, DIR_4_GPIO_Port, DIR_4_Pin);
-
-//     // // uart
-//     // uartDriver.init(&huart1, bufferUART, sizeof(bufferUART));
-
-//     // HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
-//     // HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
-//     // HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3);
-//     // HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_4);
-
-//     // start watch dog
-//     MX_IWDG_Init();
-
-//     // test();
-
-//     while (1)
-//     {
-//         blinkLed();
-
-//         encoder();
-
-//         // // xu ly input
-//         // processData();
-
-//         // // dieu khien dong co
-//         // motorControl();
-
-//         // // phan hoi (neu can)
-//         // respond();
-
-//         // static uint32_t test = 0;
-//         // if (HAL_GetTick() - test >= 1000)
-//         // {
-//         //     test = HAL_GetTick();
-//         //     DIR_1_GPIO_Port->ODR ^= DIR_1_Pin;
-//         //     DIR_2_GPIO_Port->ODR ^= DIR_2_Pin;
-//         //     DIR_3_GPIO_Port->ODR ^= DIR_3_Pin;
-//         //     DIR_4_GPIO_Port->ODR ^= DIR_4_Pin;
-//         // }
-
-//         // refresh watch dog
-//         HAL_IWDG_Refresh(&hiwdg);
-//     }
-// }
-
-#include "main_cpp.hpp"
-#include "config.hpp"
-#include "math.h"
-#include "QMC5883LCompass.h"
-
-#define METERS_PER_PULSE 0.0006
-#define MAX_PWM_ARR 255
-
-double input_pos_left = 0.0;  // Vị trí hiện tại (mét)
-double input_pos_right = 0.0; // Vị trí hiện tại (mét)
-
-double output_pwm_left = 0.0;  // Giá trị PWM xuất ra (-ARR đến +ARR)
-double output_pwm_right = 0.0; // Giá trị PWM xuất ra (-ARR đến +ARR)
-
-double setpoint_pos_left = 0.0;  // Vị trí mục tiêu (mét)
-double setpoint_pos_right = 0.0; // Vị trí mục tiêu (mét)
-
-PID posPID_Left(&input_pos_left, &output_pwm_left, &setpoint_pos_left, 150.0, 5.0, 10.0, DIRECT);
-PID posPID_Right(&input_pos_right, &output_pwm_right, &setpoint_pos_right, 150.0, 5.0, 10.0, DIRECT);
-QMC5883LCompass compass;
-
-void setup()
-{
-    posPID_Left.SetMode(AUTOMATIC);
-    posPID_Left.SetOutputLimits(-MAX_PWM_ARR, MAX_PWM_ARR);
-    posPID_Left.SetSampleTime(10); // 10ms
-
-    posPID_Right.SetMode(AUTOMATIC);
-    posPID_Right.SetOutputLimits(-MAX_PWM_ARR, MAX_PWM_ARR);
-    posPID_Right.SetSampleTime(10); // 10ms
-}
-
-void encoder()
-{
-
-    // cap nhat moi 1ms
-    if (HAL_GetTick() % 1 == 0)
-    {
-    }
-    else
-    {
-        return;
-    }
-
-    encoderData.front_left.encoderValue = __HAL_TIM_GET_COUNTER(&htim1);
-    encoderData.front_right.encoderValue = __HAL_TIM_GET_COUNTER(&htim2);
-    encoderData.rear_left.encoderValue = __HAL_TIM_GET_COUNTER(&htim3);
-    encoderData.rear_right.encoderValue = __HAL_TIM_GET_COUNTER(&htim4);
-
-    encoderData.front_left.dir = TIM1->CR1 & TIM_CR1_DIR ? 1 : 0;
-    encoderData.front_right.dir = TIM2->CR1 & TIM_CR1_DIR ? 1 : 0;
-    encoderData.rear_left.dir = TIM3->CR1 & TIM_CR1_DIR ? 1 : 0;
-    encoderData.rear_right.dir = TIM4->CR1 & TIM_CR1_DIR ? 1 : 0;
-}
-
-// // Hàm này sẽ gom toàn bộ quá trình đọc cảm biến và điều khiển PID
-// // Chạy đúng chu kỳ 10ms
-// void Robot_Control_Loop()
-// {
-//     // 1. ĐỊNH THỜI 10ms
-//     static uint32_t last_time = 0;
-//     if (HAL_GetTick() - last_time < 1)
-//     {
-//         return; // Chưa đủ 10ms, thoát hàm
-//     }
-//     last_time = HAL_GetTick(); // Cập nhật mốc thời gian
-
-//     // 2. ĐỌC ENCODER TRỰC TIẾP TỪ TIMER (Không cần hàm encoder() cũ)
-//     uint16_t current_FL = (uint16_t)__HAL_TIM_GET_COUNTER(&htim1);
-//     uint16_t current_FR = (uint16_t)__HAL_TIM_GET_COUNTER(&htim2);
-//     // doi chieu dong co sau
-//     uint16_t current_RR = (uint16_t)__HAL_TIM_GET_COUNTER(&htim3);
-//     uint16_t current_RL = (uint16_t)__HAL_TIM_GET_COUNTER(&htim4);
-
-//     // 3. TÍNH VẬN TỐC (XUNG / 10ms) BẰNG ÉP KIỂU
-//     static int16_t prev_FL = 0, prev_FR = 0, prev_RL = 0, prev_RR = 0;
-
-//     // robot.front_left.velocity = (int16_t)(current_FL - prev_FL);
-//     // robot.front_right.velocity = (int16_t)(current_FR - prev_FR);
-//     // robot.rear_left.velocity = (int16_t)(current_RL - prev_RL);
-//     // robot.rear_right.velocity = (int16_t)(current_RR - prev_RR);
-
-//     robot.front_left.velocity = (int16_t)((int16_t)prev_FL - (int16_t)current_FL);
-//     robot.front_right.velocity = (int16_t)((int16_t)prev_FR - (int16_t)current_FR);
-//     robot.rear_left.velocity = (int16_t)((int16_t)prev_RL - (int16_t)current_RL);
-//     robot.rear_right.velocity = (int16_t)((int16_t)prev_RR - (int32_t)current_RR);
-
-//     prev_FL = current_FL;
-//     prev_FR = current_FR;
-//     prev_RL = current_RL;
-//     prev_RR = current_RR;
-
-//     frontLeftMotor.computeAndControl(robot.front_left.velocity);
-//     frontRightMotor.computeAndControl(robot.front_right.velocity);
-
-//     rearLeftMotor.computeAndControl(robot.rear_left.velocity);
-//     rearRightMotor.computeAndControl(robot.rear_right.velocity);
-
-//     CalculateOdometry();
-// }
-
-// Hàm này sẽ gom toàn bộ quá trình đọc cảm biến và điều khiển PID
-// Chạy đúng chu kỳ 10ms
+// di chuyen theo toa do
 void Robot_Control_Loop()
 {
     static int16_t prev_FL = 0, prev_FR = 0, prev_RL = 0, prev_RR = 0;
 
     static uint32_t last_time = 0;
-    if (HAL_GetTick() - last_time < 1)
+    if (HAL_GetTick() - last_time < 10)
     {
         return;
     }
     last_time = HAL_GetTick();
 
-    uint16_t current_FL = (uint16_t)__HAL_TIM_GET_COUNTER(&htim1);
-    uint16_t current_FR = (uint16_t)__HAL_TIM_GET_COUNTER(&htim2);
-    uint16_t current_RR = (uint16_t)__HAL_TIM_GET_COUNTER(&htim3);
-    uint16_t current_RL = (uint16_t)__HAL_TIM_GET_COUNTER(&htim4);
+    if (robot.state.isControlNew)
+    {
+        robot.state.isControlNew = false;
+        // ben trai dao chieu
+        setpoint_pos_front_left = robot.front_left.setpoint;
+        setpoint_pos_front_right = robot.front_right.setpoint;
+        setpoint_pos_rear_left = robot.rear_left.setpoint;
+        setpoint_pos_rear_right = robot.rear_right.setpoint;
+    }
+    else
+    {
+    }
+
+    uint16_t current_FL = __HAL_TIM_GET_COUNTER(&htim1);
+    uint16_t current_FR = __HAL_TIM_GET_COUNTER(&htim2);
+    uint16_t current_RR = __HAL_TIM_GET_COUNTER(&htim3);
+    uint16_t current_RL = __HAL_TIM_GET_COUNTER(&htim4);
 
     // robot.front_left.velocity = (int16_t)(current_FL - prev_FL);
     // robot.front_right.velocity = (int16_t)(current_FR - prev_FR);
@@ -351,75 +111,89 @@ void Robot_Control_Loop()
     robot.rear_left.velocity = (int16_t)((int16_t)prev_RL - (int16_t)current_RL);
     robot.rear_right.velocity = (int16_t)((int16_t)prev_RR - (int32_t)current_RR);
 
+    // input_pos_front_left = (double)(encoderData.front_left.encoderValue) * METERS_PER_PULSE;
+    // input_pos_front_right = (double)(encoderData.front_right.encoderValue) * METERS_PER_PULSE;
+    // input_pos_rear_left = (double)(encoderData.rear_left.encoderValue) * METERS_PER_PULSE;
+    // input_pos_rear_right = (double)(encoderData.rear_right.encoderValue) * METERS_PER_PULSE;
+
+    int16_t delta_FL = (int16_t)(current_FL - prev_FL);
+    int16_t delta_FR = (int16_t)(current_FR - prev_FR);
+    int16_t delta_RL = (int16_t)(current_RL - prev_RL);
+    int16_t delta_RR = (int16_t)(current_RR - prev_RR);
+
     prev_FL = current_FL;
     prev_FR = current_FR;
     prev_RL = current_RL;
     prev_RR = current_RR;
 
-    // khoảng cách thực tế hai bánh trái
-    input_pos_left = (double)(encoderData.front_left.encoderValue) * METERS_PER_PULSE;
-    // khoảng cách thực tế hai bánh phải
-    input_pos_right = (double)(encoderData.front_right.encoderValue) * METERS_PER_PULSE;
+    // Công thức: v = (xung * quy_đổi) / thời_gian
+    input_pos_front_left = ((double)delta_FL * METERS_PER_PULSE) / DELTA_T;
+    input_pos_front_right = ((double)delta_FR * METERS_PER_PULSE) / DELTA_T;
+    input_pos_rear_left = ((double)delta_RL * METERS_PER_PULSE) / DELTA_T;
+    input_pos_rear_right = ((double)delta_RR * METERS_PER_PULSE) / DELTA_T;
 
-    if (posPID_Left.Compute())
+    if (posPID_FrontLeft.Compute())
     {
-        uint16_t left_pwm = (uint16_t)fabs(output_pwm_left);
-        MotorDir dir = (output_pwm_left >= 0) ? MotorDir::Forward : MotorDir::Backward;
+        uint16_t left_pwm = (uint16_t)fabs(output_pwm_front_left);
+        MotorDir dir = (output_pwm_front_left >= 0) ? MotorDir::Forward : MotorDir::Backward;
         frontLeftMotor.control(left_pwm, dir);
+    }
+
+    if (posPID_FrontRight.Compute())
+    {
+        uint16_t right_pwm = (uint16_t)fabs(output_pwm_front_right);
+        MotorDir dir = (output_pwm_front_right >= 0) ? MotorDir::Forward : MotorDir::Backward;
+        frontRightMotor.control(right_pwm, dir);
+    }
+
+    if (posPID_RearLeft.Compute())
+    {
+        uint16_t left_pwm = (uint16_t)fabs(output_pwm_rear_left);
+        MotorDir dir = (output_pwm_rear_left >= 0) ? MotorDir::Forward : MotorDir::Backward;
         rearLeftMotor.control(left_pwm, dir);
     }
 
-    if (posPID_Right.Compute())
+    if (posPID_RearRight.Compute())
     {
-        uint16_t right_pwm = (uint16_t)fabs(output_pwm_right);
-        MotorDir dir = (output_pwm_right >= 0) ? MotorDir::Forward : MotorDir::Backward;
-        frontRightMotor.control(right_pwm, dir);
+        uint16_t right_pwm = (uint16_t)fabs(output_pwm_rear_right);
+        MotorDir dir = (output_pwm_rear_right >= 0) ? MotorDir::Forward : MotorDir::Backward;
         rearRightMotor.control(right_pwm, dir);
     }
 
     CalculateOdometry();
 }
 
-void consumer()
-{
-    if (robot.state.isControlNew)
-    {
-        robot.state.isControlNew = false;
-
-        // ben trai dao chieu
-        frontLeftMotor.setSetpoint(robot.front_left.setpoint);
-
-        frontRightMotor.setSetpoint(robot.front_right.setpoint);
-
-        // ben trai
-        rearLeftMotor.setSetpoint(robot.rear_left.setpoint);
-
-        rearRightMotor.setSetpoint(robot.rear_right.setpoint);
-    }
-    else
-    {
-    }
-}
+// // di chuyen theo van toc
+// void consumer()
+// {
+//     if (robot.state.isControlNew)
+//     {
+//         robot.state.isControlNew = false;
+//         // ben trai dao chieu
+//         setpoint_pos_front_left = robot.front_left.setpoint;
+//         setpoint_pos_front_right = robot.front_right.setpoint;
+//         setpoint_pos_rear_left = robot.rear_left.setpoint;
+//         setpoint_pos_rear_right = robot.rear_right.setpoint;
+//     }
+//     else
+//     {
+//     }
+// }
 
 void main_cpp()
 {
     compass.init(SCL_GPIO_Port, SCL_Pin, SDA_GPIO_Port, SDA_Pin);
 
-    // 1. KHỞI ĐỘNG CÁC TIMER ENCODER
     HAL_TIM_Encoder_Start(&htim1, TIM_CHANNEL_ALL);
     HAL_TIM_Encoder_Start(&htim2, TIM_CHANNEL_ALL);
     HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_ALL);
     HAL_TIM_Encoder_Start(&htim4, TIM_CHANNEL_ALL);
 
-    // 3. KHỞI TẠO ĐỐI TƯỢNG ĐỘNG CƠ PID
-    // Thay đổi thông số Kp, Ki, Kd thực tế của bạn vào đây (VD: 0.0, 0.0, 0.0)
-    frontLeftMotor.initPID(&htim5, TIM_CHANNEL_1, DIR1_GPIO_Port, DIR1_Pin, 0.3, 0.003, 0.0, 248, LEFT);
-    frontRightMotor.initPID(&htim5, TIM_CHANNEL_2, DIR2_GPIO_Port, DIR2_Pin, 0.25, 0.005, 0.0, 248, RIGHT);
+    frontLeftMotor.init(&htim5, TIM_CHANNEL_1, DIR1_GPIO_Port, DIR1_Pin);
+    frontRightMotor.init(&htim5, TIM_CHANNEL_2, DIR2_GPIO_Port, DIR2_Pin);
+    rearRightMotor.init(&htim5, TIM_CHANNEL_3, DIR3_GPIO_Port, DIR3_Pin);
+    rearLeftMotor.init(&htim5, TIM_CHANNEL_4, DIR4_GPIO_Port, DIR4_Pin);
 
-    rearRightMotor.initPID(&htim5, TIM_CHANNEL_3, DIR3_GPIO_Port, DIR3_Pin, 0.3, 0.003, 0.0, 248, RIGHT);
-    rearLeftMotor.initPID(&htim5, TIM_CHANNEL_4, DIR4_GPIO_Port, DIR4_Pin, 0.3, 0.003, 0.0, 248, LEFT);
-
-    // 4. KHỞI ĐỘNG CÁC CHỨC NĂNG KHÁC (Watchdog, UART...)
     uartDriver.init(&huart6, bufferUART, sizeof(bufferUART));
 
     // hieu chinh la ban
@@ -437,9 +211,6 @@ void main_cpp()
     LED_MAIN_GPIO_Port->ODR ^= LED_MAIN_Pin;
     HAL_Delay(300);
 
-    // delay 2s cho nguoi dung xoay cam bien
-    HAL_Delay(2000);
-
     compass.calibrate();
     MX_IWDG_Init();
     // VÒNG LẶP CHÍNH
@@ -451,16 +222,14 @@ void main_cpp()
         // xu ly input
         processData();
 
-        // tieu thu data tu ROS
-        consumer();
-
-        encoder();
-
-        // dieu khien dong co
-        // motorControl();
-
-        // CHẠY HỆ THỐNG ĐIỀU KHIỂN CHÍNH (Đã được định thời cứng 10ms bên trong)
+        // PID
         Robot_Control_Loop();
+
+        // // tieu thu data tu ROS
+        // consumer();
+
+        // // debug
+        // encoder();
 
         // phan hoi (neu can)
         // respond();
@@ -472,7 +241,6 @@ void main_cpp()
         static uint32_t test = 0;
         if (HAL_GetTick() - test >= 1)
         {
-
             static int16_t a;
             test = HAL_GetTick();
             compass.read();

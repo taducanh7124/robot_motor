@@ -67,10 +67,10 @@ typedef struct {
 extern RobotDrive_t robot;
 extern EncoderData_t encoderData;
 
-extern MotorControlPID frontLeftMotor;
-extern MotorControlPID frontRightMotor;
-extern MotorControlPID rearLeftMotor;
-extern MotorControlPID rearRightMotor;
+extern motorControl frontLeftMotor;
+extern motorControl frontRightMotor;
+extern motorControl rearLeftMotor;
+extern motorControl rearRightMotor;
 
 // // Khai báo 4 bộ PID cho 4 bánh
 // extern PID_Controller_t pid_FL, pid_FR, pid_RL, pid_RR;
