@@ -23,9 +23,9 @@
 
 if ($debugfile -eq "")
 {
-& "C:\Users\taduc\Downloads\IAR Systems\IAR Systems\Embedded Workbench 8.3\common\bin\cspybat" -f "C:\Users\taduc\Downloads\do_an_tot_nghiep-master\do_an_tot_nghiep-master\EWARM\settings\dieu_khien_dong_co_PID.dieu_khien_dong_co_PID.general.xcl" --backend -f "C:\Users\taduc\Downloads\do_an_tot_nghiep-master\do_an_tot_nghiep-master\EWARM\settings\dieu_khien_dong_co_PID.dieu_khien_dong_co_PID.driver.xcl" 
+& "C:\Users\taduc\Downloads\IAR Systems\Embedded Workbench 8.3\common\bin\cspybat" -f "C:\Users\taduc\Downloads\do_an_tot_nghiep-master - Copy\EWARM\settings\dieu_khien_dong_co_PID.dieu_khien_dong_co_PID.general.xcl" --backend -f "C:\Users\taduc\Downloads\do_an_tot_nghiep-master - Copy\EWARM\settings\dieu_khien_dong_co_PID.dieu_khien_dong_co_PID.driver.xcl" 
 }
 else
 {
-& "C:\Users\taduc\Downloads\IAR Systems\IAR Systems\Embedded Workbench 8.3\common\bin\cspybat" -f "C:\Users\taduc\Downloads\do_an_tot_nghiep-master\do_an_tot_nghiep-master\EWARM\settings\dieu_khien_dong_co_PID.dieu_khien_dong_co_PID.general.xcl" --debug_file=$debugfile --backend -f "C:\Users\taduc\Downloads\do_an_tot_nghiep-master\do_an_tot_nghiep-master\EWARM\settings\dieu_khien_dong_co_PID.dieu_khien_dong_co_PID.driver.xcl" 
+& "C:\Users\taduc\Downloads\IAR Systems\Embedded Workbench 8.3\common\bin\cspybat" -f "C:\Users\taduc\Downloads\do_an_tot_nghiep-master - Copy\EWARM\settings\dieu_khien_dong_co_PID.dieu_khien_dong_co_PID.general.xcl" --debug_file=$debugfile --backend -f "C:\Users\taduc\Downloads\do_an_tot_nghiep-master - Copy\EWARM\settings\dieu_khien_dong_co_PID.dieu_khien_dong_co_PID.driver.xcl" 
 }

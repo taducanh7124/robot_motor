@@ -120,6 +120,29 @@ void setupPID()
     dongCoPID.dongCo4.SetOutputLimits(-255, 255);
 }
 
+float ALPHA = 0.0005f;
+static float pwmHienTai = 0;
+float pwmDich = 0; // truyen vao ham tangGiamToc trong while main
+MotorDir dirL = MotorDir::Forward;
+MotorDir dirR = MotorDir::Backward;
+
+void tangGiamToc(float pwmTuongLai)
+{
+    pwmHienTai += ALPHA * (pwmTuongLai - pwmHienTai);
+
+    if (fabs(pwmTuongLai - pwmHienTai) < 0.5f) {
+        pwmHienTai = pwmTuongLai;
+    }
+        
+
+    uint16_t pwmOut = pwmHienTai;
+
+    frontLeftMotor.control(pwmOut, dirL);
+    frontRightMotor.control(pwmOut, dirR);
+    rearRightMotor.control(pwmOut, dirR);
+    rearLeftMotor.control(pwmOut, dirL);
+}
+
 void main_cpp()
 {
     setupPID();
@@ -166,8 +189,9 @@ void main_cpp()
         processData();
 
         // // PID
-        Robot_Control_Loop();
-
+        
+        tangGiamToc(pwmDich);
+        HAL_Delay(10); // Đảm bảo vòng lặp chạy mỗi 10ms
         // phan hoi (neu can)
         // respond();
         //        configPID();
