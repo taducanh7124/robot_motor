@@ -235,7 +235,7 @@ void USART6_IRQHandler(void)
 {
   /* USER CODE BEGIN USART6_IRQn 0 */
 
-  UART_DMA_IdleHandler(&huart6); // Thêm dòng này để xử lý ngắt IDLE của UART6
+  // UART_DMA_IdleHandler(&huart6); // Thêm dòng này để xử lý ngắt IDLE của UART6
 
   /* USER CODE END USART6_IRQn 0 */
   HAL_UART_IRQHandler(&huart6);

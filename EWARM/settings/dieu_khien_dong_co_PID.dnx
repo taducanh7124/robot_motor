@@ -20,7 +20,7 @@
         <LeaveTargetRunning>_ 0</LeaveTargetRunning>
     </StLinkDriver>
     <DebugChecksum>
-        <Checksum>48758268</Checksum>
+        <Checksum>2744539849</Checksum>
     </DebugChecksum>
     <Exceptions>
         <StopOnUncaught>_ 0</StopOnUncaught>
@@ -56,6 +56,12 @@
         <ITMportsLogFile>0</ITMportsLogFile>
         <ITMlogFile>$PROJ_DIR$\ITM.log</ITMlogFile>
     </SWOTraceHWSettings>
+    <struct_types>
+        <Fmt0>DataControl_t-dir	5	0</Fmt0>
+    </struct_types>
+    <array_types>
+        <Fmt0>uint8_t[200]	5	0</Fmt0>
+    </array_types>
     <watch_formats>
         <Fmt0>{W}42:dir	3	0</Fmt0>
         <Fmt1>{W}42:encoderDirection_FL	3	0</Fmt1>

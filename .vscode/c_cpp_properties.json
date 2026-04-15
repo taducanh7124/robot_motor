@@ -3,7 +3,13 @@
         {
             "name": "STM32F1-GCC-IntelliSense",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/Core/Inc",
+                "${workspaceFolder}/Core/Cpp",
+                "${workspaceFolder}/Core/Cpp/MyCpp/MyLibrary/Inc",
+                "${workspaceFolder}/Drivers/STM32F4xx_HAL_Driver/Inc",
+                "${workspaceFolder}/Drivers/CMSIS/Include",
+                "${workspaceFolder}/Drivers/CMSIS/Device/ST/STM32F4xx/Include"
             ],
             "defines": [
                 "USE_HAL_DRIVER",

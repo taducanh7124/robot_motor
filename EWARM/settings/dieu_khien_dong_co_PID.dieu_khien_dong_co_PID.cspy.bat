@@ -25,7 +25,7 @@ if not "%~1" == "" goto debugFile
 
 @echo on 
 
-"C:\Users\taduc\Downloads\IAR Systems\Embedded Workbench 8.3\common\bin\cspybat" -f "C:\Users\taduc\Downloads\do_an_tot_nghiep-master - Copy\EWARM\settings\dieu_khien_dong_co_PID.dieu_khien_dong_co_PID.general.xcl" --backend -f "C:\Users\taduc\Downloads\do_an_tot_nghiep-master - Copy\EWARM\settings\dieu_khien_dong_co_PID.dieu_khien_dong_co_PID.driver.xcl" 
+"C:\Users\taduc\Downloads\IAR Systems\Embedded Workbench 8.3\common\bin\cspybat" -f "C:\Users\taduc\Downloads\do_an_tot_nghiep-master - Copy - Copy\EWARM\settings\dieu_khien_dong_co_PID.dieu_khien_dong_co_PID.general.xcl" --backend -f "C:\Users\taduc\Downloads\do_an_tot_nghiep-master - Copy - Copy\EWARM\settings\dieu_khien_dong_co_PID.dieu_khien_dong_co_PID.driver.xcl" 
 
 @echo off 
 goto end 
@@ -34,7 +34,7 @@ goto end
 
 @echo on 
 
-"C:\Users\taduc\Downloads\IAR Systems\Embedded Workbench 8.3\common\bin\cspybat" -f "C:\Users\taduc\Downloads\do_an_tot_nghiep-master - Copy\EWARM\settings\dieu_khien_dong_co_PID.dieu_khien_dong_co_PID.general.xcl" "--debug_file=%~1" --backend -f "C:\Users\taduc\Downloads\do_an_tot_nghiep-master - Copy\EWARM\settings\dieu_khien_dong_co_PID.dieu_khien_dong_co_PID.driver.xcl" 
+"C:\Users\taduc\Downloads\IAR Systems\Embedded Workbench 8.3\common\bin\cspybat" -f "C:\Users\taduc\Downloads\do_an_tot_nghiep-master - Copy - Copy\EWARM\settings\dieu_khien_dong_co_PID.dieu_khien_dong_co_PID.general.xcl" "--debug_file=%~1" --backend -f "C:\Users\taduc\Downloads\do_an_tot_nghiep-master - Copy - Copy\EWARM\settings\dieu_khien_dong_co_PID.dieu_khien_dong_co_PID.driver.xcl" 
 
 @echo off 
 :end
