@@ -95,7 +95,7 @@ void guiDuLieuPi()
     // 3. Đóng gói dữ liệu (Dùng luôn mảng txBuffer toàn cục đã khai báo ở UART_DMA.hpp)
     // Định dạng: odom_x, odom_y, odom_theta, odom_vx, 0.000, odom_w \n
     int doDaiGoiTin = snprintf((char*)txBuffer, sizeof(txBuffer), "%.3f,%.3f,%.3f,%.3f,0.000,%.3f\n", 
-                                odom_x, odom_y, odom_theta_rad, odom_vx, odom_w_rad);
+                                odom_x, odom_y, odom_theta_rad, odom_vx, odom_w_rad); 
 
     // 4. Kích hoạt DMA gửi đi
     if (doDaiGoiTin > 0)
