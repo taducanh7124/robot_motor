@@ -12,7 +12,7 @@
         <ByteLimit>50</ByteLimit>
     </Stack>
     <StLinkDriver>
-        <stlinkserialNo>F8BB1943</stlinkserialNo>
+        <stlinkserialNo>7691EF01</stlinkserialNo>
         <stlinkfoundProbes />
         <stlinkResetStyle>0</stlinkResetStyle>
         <stlinkResetStrategy>2</stlinkResetStrategy>
@@ -20,7 +20,7 @@
         <LeaveTargetRunning>_ 0</LeaveTargetRunning>
     </StLinkDriver>
     <DebugChecksum>
-        <Checksum>2744539849</Checksum>
+        <Checksum>2191406621</Checksum>
     </DebugChecksum>
     <Exceptions>
         <StopOnUncaught>_ 0</StopOnUncaught>
@@ -57,7 +57,10 @@
         <ITMlogFile>$PROJ_DIR$\ITM.log</ITMlogFile>
     </SWOTraceHWSettings>
     <struct_types>
-        <Fmt0>DataControl_t-dir	5	0</Fmt0>
+        <Fmt0>DataControl_t-dir	3	0</Fmt0>
+        <Fmt1>State_t-isControlNew	3	0</Fmt1>
+        <Fmt2>State_t-isDataNew	3	0</Fmt2>
+        <Fmt3>State_t-isSendDataNew	3	0</Fmt3>
     </struct_types>
     <array_types>
         <Fmt0>uint8_t[200]	5	0</Fmt0>

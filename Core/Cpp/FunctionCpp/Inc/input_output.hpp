@@ -1,7 +1,9 @@
 #ifndef INPUT_OUTPUT_HPP
 #define INPUT_OUTPUT_HPP
 
-void debugNhanDuLieuPi(float vx, float w);
+extern float debug_alpha;
+
+void debugNhanDuLieuPi(void);
 void nhanDuLieuPi(void);
 void guiDuLieuPi(void);
 

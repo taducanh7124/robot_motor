@@ -7,8 +7,8 @@
 // Tọa độ và góc
 extern float odom_x;
 extern float odom_y;
-extern float odom_theta_rad; 
-extern float odom_theta_deg; 
+extern float odom_theta_rad;
+extern float odom_theta_deg;
 
 // Vận tốc
 extern float odom_vx;

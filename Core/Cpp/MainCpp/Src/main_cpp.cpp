@@ -18,38 +18,46 @@ float delta_ccr = 10.0f; // Khi ccrHT gan bang ccrTL, cho ccrHT = ccrTL
 // Hàm tăng tốc độ từ từ motor
 void controlOnDinh()
 {
-    // Bên trái
+    // Bên trái trước
     robot.motor_front_left.ccrHT += ALPHA * (robot.motor_front_left.ccrTL - robot.motor_front_left.ccrHT);
     if (fabsf(robot.motor_front_left.ccrTL - robot.motor_front_left.ccrHT) < delta_ccr)
     {
         robot.motor_front_left.ccrHT = robot.motor_front_left.ccrTL;
     }
+    // Bên trái sau
+    robot.motor_rear_left.ccrHT += ALPHA * (robot.motor_rear_left.ccrTL - robot.motor_rear_left.ccrHT);
+    if (fabsf(robot.motor_rear_left.ccrTL - robot.motor_rear_left.ccrHT) < delta_ccr)
+    {
+        robot.motor_rear_left.ccrHT = robot.motor_rear_left.ccrTL;
+    }
 
-    // Bên phải
+    // Bên phải trước
     robot.motor_front_right.ccrHT += ALPHA * (robot.motor_front_right.ccrTL - robot.motor_front_right.ccrHT);
     if (fabsf(robot.motor_front_right.ccrTL - robot.motor_front_right.ccrHT) < delta_ccr)
     {
         robot.motor_front_right.ccrHT = robot.motor_front_right.ccrTL;
     }
-    // Áp dụng cho 2 bánh sau
-    robot.motor_rear_left.ccrHT = robot.motor_front_left.ccrHT;
-    robot.motor_rear_right.ccrHT = robot.motor_front_right.ccrHT;
+    // Bên phải sau
+    robot.motor_rear_right.ccrHT += ALPHA * (robot.motor_rear_right.ccrTL - robot.motor_rear_right.ccrHT);
+    if (fabsf(robot.motor_rear_right.ccrTL - robot.motor_rear_right.ccrHT) < delta_ccr)
+    {
+        robot.motor_rear_right.ccrHT = robot.motor_rear_right.ccrTL;
+    }
 
-    // Bánh Trái
-    MotorDir dir_L = (robot.motor_front_left.ccrHT >= 0) ? MotorDir::Forward : MotorDir::Backward; // Xét dấu
-    // Bánh Phải
-    MotorDir dir_R = (robot.motor_front_right.ccrHT >= 0) ? MotorDir::Forward : MotorDir::Backward;
+    // CẬP NHẬT BIẾN DIR VÀO STRUCT (Dựa trên dấu của ccrHT hiện tại)
+    // Ben trai
+    robot.motor_front_left.dir = (robot.motor_front_left.ccrHT >= 0) ? static_cast<uint8_t>(MotorDir::Forward) : static_cast<uint8_t>(MotorDir::Backward);
+    robot.motor_rear_left.dir = (robot.motor_rear_left.ccrHT >= 0) ? static_cast<uint8_t>(MotorDir::Forward) : static_cast<uint8_t>(MotorDir::Backward);
+    // Ben phai
+    robot.motor_front_right.dir = (robot.motor_front_right.ccrHT >= 0) ? static_cast<uint8_t>(MotorDir::Backward) : static_cast<uint8_t>(MotorDir::Forward);
+    robot.motor_rear_right.dir = (robot.motor_rear_right.ccrHT >= 0) ? static_cast<uint8_t>(MotorDir::Backward) : static_cast<uint8_t>(MotorDir::Forward);
 
-
-    // Điều khiển motor thật với ccrHT tăng từ từ
-    MotorCtr_FL.control((uint16_t)fabsf(robot.motor_front_left.ccrHT), dir_L);
-    MotorCtr_FR.control((uint16_t)fabsf(robot.motor_front_right.ccrHT), dir_R);
-    MotorCtr_RL.control((uint16_t)fabsf(robot.motor_rear_left.ccrHT), dir_L);
-    MotorCtr_RR.control((uint16_t)fabsf(robot.motor_rear_right.ccrHT), dir_R);
+    // ĐIỀU KHIỂN MOTOR THẬT (Lấy giá trị từ struct ra)
+    MotorCtr_FL.control((uint16_t)fabsf(robot.motor_front_left.ccrHT), static_cast<MotorDir>(robot.motor_front_left.dir));
+    MotorCtr_FR.control((uint16_t)fabsf(robot.motor_front_right.ccrHT), static_cast<MotorDir>(robot.motor_front_right.dir));
+    MotorCtr_RL.control((uint16_t)fabsf(robot.motor_rear_left.ccrHT), static_cast<MotorDir>(robot.motor_rear_left.dir));
+    MotorCtr_RR.control((uint16_t)fabsf(robot.motor_rear_right.ccrHT), static_cast<MotorDir>(robot.motor_rear_right.dir));
 }
-
-float vxInput = 0.0f; // Biến toàn cục để lưu giá trị tốc độ tuyến tính và góc xoay nhận được, dùng cho debug
-float wInput = 0.0f;  // Biến toàn cục để lưu giá trị góc xoay nhận được, dùng cho debug
 
 void main_cpp()
 {
@@ -68,8 +76,8 @@ void main_cpp()
     // Khoi tao cac dong co
     MotorCtr_FL.init(&htim5, TIM_CHANNEL_1, DIR1_GPIO_Port, DIR1_Pin);
     MotorCtr_FR.init(&htim5, TIM_CHANNEL_2, DIR2_GPIO_Port, DIR2_Pin);
-    MotorCtr_RL.init(&htim5, TIM_CHANNEL_3, DIR3_GPIO_Port, DIR3_Pin);
-    MotorCtr_RR.init(&htim5, TIM_CHANNEL_4, DIR4_GPIO_Port, DIR4_Pin);
+    MotorCtr_RL.init(&htim5, TIM_CHANNEL_4, DIR4_GPIO_Port, DIR4_Pin);
+    MotorCtr_RR.init(&htim5, TIM_CHANNEL_3, DIR3_GPIO_Port, DIR3_Pin);
 
     // Khoi tao timer doc encoder cho cac dong co
     HAL_TIM_Encoder_Start(&htim1, TIM_CHANNEL_ALL);
@@ -92,28 +100,28 @@ void main_cpp()
         nhayLed();
 
         // xu ly input
-        // debugNhanDuLieuPi(vxInput, wInput);
+        // debugNhanDuLieuPi();
         nhanDuLieuPi();
 
         // Đọc cảm biến siêu âm mỗi 50ms
-        if (HAL_GetTick() - tgDoHSCu >= 50)
-        {
-            tgDoHSCu = HAL_GetTick();
-            isBlocked = false;          // reset trạng thái có vật cản trước khi kiểm tra lại
-            for (int i = 0; i < 4; i++) // kiem tra 4 cam bien sieu am xem co vat can hay khong
-            {
-                if (ArrayHS[i].khoangCach > 2.0f && ArrayHS[i].khoangCach < 100.0f)
-                {
-                    isBlocked = true; // Có vật cản
-                    break;            // Ngay lap tuc thoat vong for
-                }
-            }
-            for (int i = 0; i < 4; i++) // xoa du lieu truoc khi do cam bien sieu am lan sau
-            {
-                ArrayHS[i].khoangCach = 0.0f;
-            }
-            kichHoatTrig(); // kich hoat chan trig de do cam bien sieu am
-        }
+        // if (HAL_GetTick() - tgDoHSCu >= 50)
+        // {
+        //     tgDoHSCu = HAL_GetTick();
+        //     isBlocked = false;          // reset trạng thái có vật cản trước khi kiểm tra lại
+        //     for (int i = 0; i < 4; i++) // kiem tra 4 cam bien sieu am xem co vat can hay khong
+        //     {
+        //         if (ArrayHS[i].khoangCach > 2.0f && ArrayHS[i].khoangCach < 100.0f)
+        //         {
+        //             isBlocked = true; // Có vật cản
+        //             break;            // Ngay lap tuc thoat vong for
+        //         }
+        //     }
+        //     for (int i = 0; i < 4; i++) // xoa du lieu truoc khi do cam bien sieu am lan sau
+        //     {
+        //         ArrayHS[i].khoangCach = 0.0f;
+        //     }
+        //     kichHoatTrig(); // kich hoat chan trig de do cam bien sieu am
+        // }
 
         if (HAL_GetTick() - tgDieuKhienMotorCu >= 10)
         {
