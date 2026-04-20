@@ -83,34 +83,13 @@ void MotorControl::stop()
 
 // Khoi tao doi tuong dieu khien robot
 RobotDrive_t robot = {
-    .state = { 
-        .isDataNew     = 0, // 0 = chua co du lieu moi de nhan, 1 = da co du lieu moi tu pi
+    .state = {
+        .isDebugMode = 0,   // 0 = dang chay binh thuong, 1 = dang chay debug
+        .isDataNew = 0,     // 0 = chua co du lieu moi de nhan, 1 = da co du lieu moi tu pi
         .isSendDataNew = 1, // 0 = khong co du lieu moi de gui, 1 = co du lieu moi de gui cho pi
-        .isControlNew  = 0 
-    },
+        .isControlNew = 0},
 
-    .motor_front_left = {
-        .dir   = 0,
-        .ccrHT = 0,
-        .ccrTL = 0,
-        .vanToc = 0.0f
-    },
-    .motor_front_right = {
-        .dir   = 0,
-        .ccrHT = 0,
-        .ccrTL = 0,
-        .vanToc = 0.0f
-    },
-    .motor_rear_left = {
-        .dir   = 0,
-        .ccrHT = 0,
-        .ccrTL = 0,
-        .vanToc = 0.0f
-    },
-    .motor_rear_right = {
-        .dir   = 0,
-        .ccrHT = 0,
-        .ccrTL = 0,
-        .vanToc = 0.0f
-    }
-};
+    .motor_front_left = {.dir = 0, .ccrHT = 0, .ccrTL = 0, .vanToc = 0.0f},
+    .motor_front_right = {.dir = 0, .ccrHT = 0, .ccrTL = 0, .vanToc = 0.0f},
+    .motor_rear_left = {.dir = 0, .ccrHT = 0, .ccrTL = 0, .vanToc = 0.0f},
+    .motor_rear_right = {.dir = 0, .ccrHT = 0, .ccrTL = 0, .vanToc = 0.0f}};

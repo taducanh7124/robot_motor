@@ -92,15 +92,16 @@ void tinhTrangThaiGoc(float deltaT)
 {
     // 1. TÍNH VẬN TỐC GÓC TỪ ENCODER (w_enc)
     // Tính vận tốc từ 4 bánh
-    odom_w_enc = (vtTrungBinhPhai - vtTrungBinhTrai) / KHOANGCACH2BANH;
+    // odom_w_enc = (vtTrungBinhPhai - vtTrungBinhTrai) / KHOANGCACH2BANH;
 
     // 2. LẤY VẬN TỐC GÓC TỪ MPU6050 (w_gyro)
     // Lưu ý: Biến mpu.vt_goc_z đã được cập nhật liên tục bên file main.cpp
-    odom_w_mpu = mpu.vt_goc_z * (PI / 180.0f); // Đổi từ Độ/s sang Rad/s
+    odom_w_mpu = MPU6050_1.vt_goc_z * (PI / 180.0f); // Đổi từ Độ/s sang Rad/s
 
     // 3. LỌC BÙ (COMPLEMENTARY FILTER)
-    // Tin Gyro 98% (Chống trượt bánh), Tin Encoder 2% (Chống trôi tĩnh)
-    odom_w_rad = 0.98f * odom_w_mpu + 0.02f * odom_w_enc;
+    // Tin Gyro 98% (Chống trượt bánh), Tin Encoder 2% (Chống trôi tĩnh) KHÔNG DÙNG, GÂY NHIỄU NẶNG HƠN
+    // odom_w_rad = 0.98f * odom_w_mpu + 0.02f * odom_w_enc;
+    odom_w_rad = odom_w_mpu;
 
     // 4. TÍCH PHÂN TÌM RA GÓC HƯỚNG CỦA XE
     odom_theta_rad += odom_w_rad * deltaT;

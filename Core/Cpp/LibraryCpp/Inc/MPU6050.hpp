@@ -16,7 +16,7 @@ public:
     float goc_z;    // Góc Yaw (Độ) - Tích phân từ vận tốc
     float vt_goc_z; // Vận tốc góc Yaw (Độ/giây) - Đọc trực tiếp
 
-    MPU6050(); 
+    MPU6050();
 
     // Hàm nạp thông số phần cứng
     void init(I2C_HandleTypeDef *_hi2c, TIM_HandleTypeDef *_htim, uint8_t i2c_addr = (0x68 << 1));
@@ -27,5 +27,5 @@ public:
     void tinhGocZ();  // Đọc data và tích phân góc
 };
 
-extern MPU6050 mpu;
+extern MPU6050 MPU6050_1;
 #endif // MPU6050_HPP

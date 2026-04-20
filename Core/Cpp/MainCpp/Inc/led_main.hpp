@@ -2,5 +2,6 @@
 #define LED_MAIN_HPP
 
 void nhayLed();
+void nhayLedMode();
 
 #endif

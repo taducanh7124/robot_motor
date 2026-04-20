@@ -72,7 +72,7 @@ void MPU6050::hieuChuan() {
 }
 
 void MPU6050::tinhGocZ() {
-    // 1. TÍNH dt BẰNG TIMER 9
+    // 1. TÍNH dt BẰNG TIMER 10
     uint16_t currentTime = __HAL_TIM_GET_COUNTER(htim);
     uint16_t elapsed_us;
 

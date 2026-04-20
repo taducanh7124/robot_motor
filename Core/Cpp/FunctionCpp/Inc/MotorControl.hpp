@@ -43,6 +43,7 @@ typedef struct
 // Trang thai cua robot
 typedef struct
 {
+    uint8_t isDebugMode;   // Flag cho biet robot dang o trang thai debug hay khong
     uint8_t isDataNew;     // Flag co du lieu moi nhan tu pi, 0 = chua co du lieu moi de nhan, 1 = da co du lieu moi tu pi
     uint8_t isSendDataNew; // Flag co du lieu moi gui cho pi, 0 = khong co du lieu moi de gui, 1 = co du lieu moi de gui cho pi
     uint8_t isControlNew;  // Flag co du lieu dieu khien moi de cap nhat dong co
