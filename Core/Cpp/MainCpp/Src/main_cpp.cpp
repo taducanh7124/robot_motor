@@ -5,7 +5,7 @@
 #include "usart.h"
 #include "const.hpp"
 #include "MotorControl.hpp"
-#include "QMC5883LCompass.hpp"
+#include "MPU6050.hpp"
 #include "HCSR04HyperSonic.hpp"
 #include "UART_DMA.hpp"
 #include "input_output.hpp"
@@ -13,32 +13,33 @@
 #include "led_main.hpp"
 
 extern TIM_HandleTypeDef htim9;
+extern I2C_HandleTypeDef hi2c1;
 float delta_ccr = 10.0f; // Khi ccrHT gan bang ccrTL, cho ccrHT = ccrTL
 
 // Hàm tăng tốc độ từ từ motor
 void controlOnDinh()
 {
     // Bên trái trước
-    robot.motor_front_left.ccrHT += ALPHA * (robot.motor_front_left.ccrTL - robot.motor_front_left.ccrHT);
+    robot.motor_front_left.ccrHT += debug_alpha * (robot.motor_front_left.ccrTL - robot.motor_front_left.ccrHT);
     if (fabsf(robot.motor_front_left.ccrTL - robot.motor_front_left.ccrHT) < delta_ccr)
     {
         robot.motor_front_left.ccrHT = robot.motor_front_left.ccrTL;
     }
     // Bên trái sau
-    robot.motor_rear_left.ccrHT += ALPHA * (robot.motor_rear_left.ccrTL - robot.motor_rear_left.ccrHT);
+    robot.motor_rear_left.ccrHT += debug_alpha * (robot.motor_rear_left.ccrTL - robot.motor_rear_left.ccrHT);
     if (fabsf(robot.motor_rear_left.ccrTL - robot.motor_rear_left.ccrHT) < delta_ccr)
     {
         robot.motor_rear_left.ccrHT = robot.motor_rear_left.ccrTL;
     }
 
     // Bên phải trước
-    robot.motor_front_right.ccrHT += ALPHA * (robot.motor_front_right.ccrTL - robot.motor_front_right.ccrHT);
+    robot.motor_front_right.ccrHT += debug_alpha * (robot.motor_front_right.ccrTL - robot.motor_front_right.ccrHT);
     if (fabsf(robot.motor_front_right.ccrTL - robot.motor_front_right.ccrHT) < delta_ccr)
     {
         robot.motor_front_right.ccrHT = robot.motor_front_right.ccrTL;
     }
     // Bên phải sau
-    robot.motor_rear_right.ccrHT += ALPHA * (robot.motor_rear_right.ccrTL - robot.motor_rear_right.ccrHT);
+    robot.motor_rear_right.ccrHT += debug_alpha * (robot.motor_rear_right.ccrTL - robot.motor_rear_right.ccrHT);
     if (fabsf(robot.motor_rear_right.ccrTL - robot.motor_rear_right.ccrHT) < delta_ccr)
     {
         robot.motor_rear_right.ccrHT = robot.motor_rear_right.ccrTL;
@@ -59,19 +60,49 @@ void controlOnDinh()
     MotorCtr_RR.control((uint16_t)fabsf(robot.motor_rear_right.ccrHT), static_cast<MotorDir>(robot.motor_rear_right.dir));
 }
 
+MPU6050 mpu;
+uint8_t dia_chi_tim_thay = 0;
+
 void main_cpp()
 {
-    // Khoi tao cam bien la ban
-    compass.init(SCL_GPIO_Port, SCL_Pin, SDA_GPIO_Port, SDA_Pin);
-    compass.setSmoothing(5, true); // Smoothing 5 bước
-    HAL_Delay(100);                // Đợi cảm biến ổn định
-    // Đọc nháp 10 lần để lấp đầy mảng lọc nhiễu (Vứt bỏ kết quả)
-    for (int i = 0; i < 10; i++)
+    // Khoi tao cam bien quan tinh
+    HAL_TIM_Base_Start(&htim9);
+    // Quet dia chi i2c
+    // dia_chi_tim_thay = 0;
+    // for (uint8_t i = 1; i < 128; i++)
+    // {
+    //     // Gửi thử tín hiệu đến tất cả 127 địa chỉ
+    //     if (HAL_I2C_IsDeviceReady(&hi2c1, (uint16_t)(i << 1), 3, 10) == HAL_OK)
+    //     {
+    //         dia_chi_tim_thay = i;
+    //         __NOP(); // <--- BẠN ĐẶT 1 CÁI BREAKPOINT (Dấu chấm đỏ) Ở DÒNG NÀY!!!
+    //     }
+    // }
+
+    // Nạp thông số và đánh thức cảm biến
+    // mpu.init(&hi2c1, &htim9, (0x68 << 1));
+    // if (!mpu.begin())
+    // {
+    //     // Nếu lỗi I2C, nháy LED đỏ/nhanh báo hiệu
+    //     while (1)
+    //     {
+    //         nhayLed();
+    //         HAL_Delay(20);
+    //     }
+    // }
+
+    // Hiệu chuẩn Gyro Z (Lưu ý: Robot phải đứng im tuyệt đối trong 2 giây này)
+    // Nháy LED chậm báo hiệu đang hiệu chuẩn
+    for (int i = 0; i < 6; i++)
     {
-        compass.read();
-        HAL_Delay(10); // Đợi 10ms giữa mỗi lần đọc cho đúng nhịp
+        nhayLed();
+        HAL_Delay(200);
     }
-    theta_goc = compass.getAzimuth(); // Lấy góc gốc khi khởi tạo để tính toán sau này
+    // mpu.hieuChuan();
+
+    // Bật LED sáng tĩnh báo hiệu đã sẵn sàng chạy
+    nhayLed();
+    // mpu.lastTime = __HAL_TIM_GET_COUNTER(mpu.htim);
 
     // Khoi tao cac dong co
     MotorCtr_FL.init(&htim5, TIM_CHANNEL_1, DIR1_GPIO_Port, DIR1_Pin);
@@ -85,23 +116,33 @@ void main_cpp()
     HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_ALL);
     HAL_TIM_Encoder_Start(&htim4, TIM_CHANNEL_ALL);
 
-    // Khoi tao timer cho cam bien sieu am
-    HAL_TIM_Base_Start(&htim9);
-
     // Khoi tao UART DMA gui du lieu cho pi
     UART_DMA_6.init(&huart6, rxBuffer, sizeof(rxBuffer));
 
-    uint32_t tgDoHSCu = 0;           // thoi gian do cam bien sieu am cu
+    uint32_t tgNhayLedCu = 0;
+    uint32_t tgDoHSCu = 0; // thoi gian do cam bien sieu am cu
+    uint32_t tgTinhGocZCu = 0;
     uint32_t tgDieuKhienMotorCu = 0; // thoi gian dieu khien dong co
 
     while (1)
     {
         // Nháy LED báo trạng thái sống
-        nhayLed();
+        if (HAL_GetTick() - tgNhayLedCu > 500)
+        {
+            tgNhayLedCu = HAL_GetTick();
+            nhayLed();
+        }
+
+        // Tinh cac thong so goc z
+        // if (HAL_GetTick() - tgTinhGocZCu > 10)
+        // {
+        //     tgTinhGocZCu = HAL_GetTick();
+        //     mpu.tinhGocZ();
+        // }
 
         // xu ly input
-        // debugNhanDuLieuPi();
-        nhanDuLieuPi();
+        debugNhanDuLieuPi();
+        // nhanDuLieuPi();
 
         // Đọc cảm biến siêu âm mỗi 50ms
         // if (HAL_GetTick() - tgDoHSCu >= 50)
@@ -145,6 +186,7 @@ void main_cpp()
         tinhOdom();
 
         // Gui du lieu odometry len pi
-        guiDuLieuPi();
+        debugGuiDuLieuPi();
+        // guiDuLieuPi();
     }
 }

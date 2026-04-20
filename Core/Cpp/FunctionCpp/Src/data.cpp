@@ -3,7 +3,7 @@
 #include "main.h"
 #include "tim.h"
 #include "const.hpp"
-#include "QMC5883LCompass.hpp"
+#include "MPU6050.hpp"
 #include "MotorControl.hpp"
 
 // Biến toàn cục lưu trữ dữ liệu odometry
@@ -15,12 +15,15 @@ float odom_theta_deg = 0.0f;
 float odom_vx = 0.0f;
 float odom_w_rad = 0.0f;
 
+float vtTrungBinhTrai = 0;
+float vtTrungBinhPhai = 0;
+
 // Biến quản lý thời gian tổng
 uint32_t tgTinhOdomCu = 0; // thoi gian truoc do tinh odom
 uint32_t tgTinhOdom = 100; // thoi gian giua cac lan tinh odom (100ms)
 
 // Khởi tạo cảm biến la bàn QMC5883L và biến lưu góc gốc
-QMC5883LCompass compass;
+
 float theta_goc = 0.0f;
 
 void tinhVanToc(float deltaT) // Nhận deltaT từ hàm quản lý truyền vào
@@ -70,8 +73,8 @@ void tinhVanToc(float deltaT) // Nhận deltaT từ hàm quản lý truyền và
     robot.motor_rear_right.vanToc = -(delta_RR * MET1XUNG) / deltaT; // bánh phía phải ngược chiều nên đổi dấu
 
     // Tinh vận tốc trung bình của robot dựa trên vận tốc của 4 bánh
-    float vtTrungBinhTrai = (robot.motor_rear_left.vanToc + robot.motor_front_left.vanToc) / 2.0f;
-    float vtTrungBinhPhai = (robot.motor_rear_right.vanToc + robot.motor_front_right.vanToc) / 2.0f;
+    vtTrungBinhTrai = (robot.motor_rear_left.vanToc + robot.motor_front_left.vanToc) / 2.0f;
+    vtTrungBinhPhai = (robot.motor_rear_right.vanToc + robot.motor_front_right.vanToc) / 2.0f;
     odom_vx = (vtTrungBinhTrai + vtTrungBinhPhai) / 2.0f;
 
     // Cập nhật vị trí encoder cho lần sau
@@ -81,44 +84,42 @@ void tinhVanToc(float deltaT) // Nhận deltaT từ hàm quản lý truyền và
     xungQK_RR = xungHT_RR;
 }
 
-void tinhGoc()
+float odom_w_enc = 0;
+float odom_w_mpu = 0;
+
+// HÀM MỚI: TÍNH CẢ VẬN TỐC GÓC VÀ GÓC (Bằng Complementary Filter)
+void tinhTrangThaiGoc(float deltaT)
 {
-    compass.read();
-    odom_theta_deg = compass.getAzimuth() - theta_goc; // Lấy góc hiện tại trừ đi góc gốc
+    // 1. TÍNH VẬN TỐC GÓC TỪ ENCODER (w_enc)
+    // Tính vận tốc từ 4 bánh
+    odom_w_enc = (vtTrungBinhPhai - vtTrungBinhTrai) / KHOANGCACH2BANH;
 
-    if (odom_theta_deg > 180.0f)
-        odom_theta_deg -= 360.0f;
-    else if (odom_theta_deg < -180.0f)
-        odom_theta_deg += 360.0f;
+    // 2. LẤY VẬN TỐC GÓC TỪ MPU6050 (w_gyro)
+    // Lưu ý: Biến mpu.vt_goc_z đã được cập nhật liên tục bên file main.cpp
+    odom_w_mpu = mpu.vt_goc_z * (PI / 180.0f); // Đổi từ Độ/s sang Rad/s
 
-    odom_theta_rad = odom_theta_deg * PI / 180.0f; // Chuyển góc sang radian để tính toán
-}
+    // 3. LỌC BÙ (COMPLEMENTARY FILTER)
+    // Tin Gyro 98% (Chống trượt bánh), Tin Encoder 2% (Chống trôi tĩnh)
+    odom_w_rad = 0.98f * odom_w_mpu + 0.02f * odom_w_enc;
 
-void tinhVanTocGoc(float deltaT)
-{
-    // Dùng static để giữ giá trị giữa các lần chạy hàm (Thay thế cho biến toàn cục)
-    static float odom_theta_deg_cu = 0.0f;
-    static float odom_w_rad_loc = 0.0f; // Vận tốc góc đã lọc
+    // 4. TÍCH PHÂN TÌM RA GÓC HƯỚNG CỦA XE
+    odom_theta_rad += odom_w_rad * deltaT;
 
-    float delta_theta_deg = odom_theta_deg - odom_theta_deg_cu; // Chenh lech do giua 2 lan do
+    // 5. CHUẨN HÓA GÓC (Giữ góc luôn nằm trong khoảng -PI đến PI)
+    if (odom_theta_rad > PI) {
+        odom_theta_rad -= 2.0f * PI;
+    } else if (odom_theta_rad < -PI) {
+        odom_theta_rad += 2.0f * PI;
+    }
 
-    // xu li tran goc
-    if (delta_theta_deg > 180.0f)
-        delta_theta_deg -= 360.0f;
-    else if (delta_theta_deg < -180.0f)
-        delta_theta_deg += 360.0f;
-
-    float odom_w_rad_tho = (delta_theta_deg * PI / 180.0f) / deltaT; // Van toc goc thô
-    odom_w_rad_loc = odom_w_rad_loc * 0.8f + odom_w_rad_tho * 0.2f;  // Tinh van toc goc loc
-    odom_w_rad = odom_w_rad_loc;
-
-    odom_theta_deg_cu = odom_theta_deg;
+    // 6. CẬP NHẬT RA ĐỘ (Để hiển thị lên màn hình hoặc Web)
+    odom_theta_deg = odom_theta_rad * (180.0f / PI);
 }
 
 void tinhToaDo(float deltaT)
 {
-    odom_x += odom_vx * cos(odom_theta_rad) * deltaT;
-    odom_y += odom_vx * sin(odom_theta_rad) * deltaT;
+    odom_x += odom_vx * cosf(odom_theta_rad) * deltaT;
+    odom_y += odom_vx * sinf(odom_theta_rad) * deltaT;
 }
 
 // =======================================================
@@ -138,7 +139,42 @@ void tinhOdom()
 
     // Chạy các hàm con theo đúng quy trình
     tinhVanToc(deltaT);
-    tinhGoc();
-    tinhVanTocGoc(deltaT);
+    // tinhGoc();
+    // tinhVanTocGoc(deltaT);
+    tinhTrangThaiGoc(deltaT);
     tinhToaDo(deltaT);
 }
+
+// void tinhGoc()
+// {
+//     compass.read();
+//     odom_theta_deg = compass.getAzimuth() - theta_goc; // Lấy góc hiện tại trừ đi góc gốc
+
+//     if (odom_theta_deg > 180.0f)
+//         odom_theta_deg -= 360.0f;
+//     else if (odom_theta_deg < -180.0f)
+//         odom_theta_deg += 360.0f;
+
+//     odom_theta_rad = odom_theta_deg * PI / 180.0f; // Chuyển góc sang radian để tính toán
+// }
+
+// void tinhVanTocGoc(float deltaT)
+// {
+//     // Dùng static để giữ giá trị giữa các lần chạy hàm (Thay thế cho biến toàn cục)
+//     static float odom_theta_deg_cu = 0.0f;
+//     static float odom_w_rad_loc = 0.0f; // Vận tốc góc đã lọc
+
+//     float delta_theta_deg = odom_theta_deg - odom_theta_deg_cu; // Chenh lech do giua 2 lan do
+
+//     // xu li tran goc
+//     if (delta_theta_deg > 180.0f)
+//         delta_theta_deg -= 360.0f;
+//     else if (delta_theta_deg < -180.0f)
+//         delta_theta_deg += 360.0f;
+
+//     float odom_w_rad_tho = (delta_theta_deg * PI / 180.0f) / deltaT; // Van toc goc thô
+//     odom_w_rad_loc = odom_w_rad_loc * 0.8f + odom_w_rad_tho * 0.2f;  // Tinh van toc goc loc
+//     odom_w_rad = odom_w_rad_loc;
+
+//     odom_theta_deg_cu = odom_theta_deg;
+// }

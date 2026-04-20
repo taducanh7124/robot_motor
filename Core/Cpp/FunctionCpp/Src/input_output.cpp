@@ -13,7 +13,7 @@
 
 // KHOANG 6.5 VÒNG 1 GIÂY?
 uint32_t tgNhanDuLieuPiCu = 0; // Biến toàn cục để lưu thời điểm cuối cùng nhận dữ liệu từ Pi
-uint32_t tgGuiDuLieuPiCu = 0; // thoi gian truoc do gui du lieu len pi
+uint32_t tgGuiDuLieuPiCu = 0;  // thoi gian truoc do gui du lieu len pi
 float debug_ccr_L = 0.0f;      // Biến toàn cục để soi IAR
 float debug_ccr_R = 0.0f;      // Biến toàn cục để soi IAR
 float debug_alpha = 0.1f;      // Cho giá trị mặc định tránh bằng 0 lúc mới bật máy
@@ -88,7 +88,44 @@ void nhanDuLieuPi()
     }
 }
 
+void debugGuiDuLieuPi()
+{
+    // 1. Kiểm tra chu kỳ gửi (Ví dụ 50ms = 20Hz)
+    if (HAL_GetTick() - tgGuiDuLieuPiCu < 50)
+    {
+        return;
+    }
 
+    // 2. Kiểm tra xem bộ DMA đã rảnh chưa (1 = Rảnh, 0 = Đang bận)
+    if (!robot.state.isSendDataNew)
+    {
+        return;
+    }
+
+    tgGuiDuLieuPiCu = HAL_GetTick();
+
+    static int doDaiGoiTin;
+
+    // 3. Đóng gói dữ liệu với 9 thông số
+    // Thứ tự: x, y, theta_rad, vx, vy, w_rad_loc, theta_deg, w_enc_tho, w_mpu_tho
+    doDaiGoiTin = snprintf((char *)txBuffer, sizeof(txBuffer),
+                           "%.3f,%.3f,%.3f,%.3f,0.000,%.3f,%.1f,%.3f,%.3f\n",
+                           odom_x,
+                           odom_y,
+                           odom_theta_rad,
+                           odom_vx,
+                           odom_w_rad,
+                           odom_theta_deg,
+                           odom_w_enc,
+                           odom_w_mpu);
+
+    // 4. Kích hoạt DMA gửi đi
+    if (doDaiGoiTin > 0)
+    {
+        robot.state.isSendDataNew = 0; // Hạ cờ BẬN
+        HAL_UART_Transmit_DMA(&huart6, txBuffer, doDaiGoiTin);
+    }
+}
 
 // Hàm gửi dữ liệu odometry ra UART cho pi
 void guiDuLieuPi()

@@ -3,7 +3,11 @@
 
 extern float debug_alpha;
 
+// Ham debug
 void debugNhanDuLieuPi(void);
+void debugGuiDuLieuPi(void);
+
+// Ham chuc nang
 void nhanDuLieuPi(void);
 void guiDuLieuPi(void);
 

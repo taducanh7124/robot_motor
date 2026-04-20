@@ -1252,6 +1252,9 @@
                                 <name>$PROJ_DIR$\..\Core\Cpp\LibraryCpp\Inc\i2c_software.hpp</name>
                             </file>
                             <file>
+                                <name>$PROJ_DIR$\..\Core\Cpp\LibraryCpp\Inc\MPU6050.hpp</name>
+                            </file>
+                            <file>
                                 <name>$PROJ_DIR$\..\Core\Cpp\LibraryCpp\Inc\pin_config.hpp</name>
                             </file>
                             <file>
@@ -1262,6 +1265,9 @@
                             <name>Src</name>
                             <file>
                                 <name>$PROJ_DIR$\..\Core\Cpp\LibraryCpp\Src\i2c_software.cpp</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\Core\Cpp\LibraryCpp\Src\MPU6050.cpp</name>
                             </file>
                             <file>
                                 <name>$PROJ_DIR$\..\Core\Cpp\LibraryCpp\Src\QMC5883LCompass.cpp</name>

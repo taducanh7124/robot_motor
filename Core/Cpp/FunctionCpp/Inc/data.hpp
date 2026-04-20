@@ -14,6 +14,10 @@ extern float odom_theta_deg;
 extern float odom_vx;
 extern float odom_w_rad;
 
+// Goc
+extern float odom_w_enc;
+extern float odom_w_mpu;
+
 // Biến quản lý thời gian
 extern uint32_t tgTinhOdomCu;
 extern uint32_t tgTinhOdom;
