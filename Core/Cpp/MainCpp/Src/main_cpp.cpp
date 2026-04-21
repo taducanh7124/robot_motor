@@ -152,12 +152,12 @@ void main_cpp()
         }
 
         // Đọc cảm biến siêu âm mỗi 50ms
-        if (HAL_GetTick() - tgDoHSCu >= 50)
-        {
-            tgDoHSCu = HAL_GetTick();
-            kiemTraHS();
-            kichHoatTrig(); // kich hoat chan trig de do cam bien sieu am
-        }
+        // if (HAL_GetTick() - tgDoHSCu >= 50)
+        // {
+        //     tgDoHSCu = HAL_GetTick();
+        //     kiemTraHS();
+        //     kichHoatTrig(); // kich hoat chan trig de do cam bien sieu am
+        // }
 
         if (HAL_GetTick() - tgDieuKhienMotorCu >= 10)
         {
@@ -213,7 +213,7 @@ extern "C" void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
         if (thoiGianBamMoi - thoiGianBamCu > 200)
         {
             // Đảo cờ trạng thái của robot (Debug <-> Normal)
-            robot.state.isDebugMode = !robot.state.isDebugMode;
+            robot.state.isDebugMode = false;
         }
         thoiGianBamCu = thoiGianBamMoi;
     }
