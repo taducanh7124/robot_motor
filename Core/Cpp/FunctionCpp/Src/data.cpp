@@ -22,10 +22,6 @@ float vtTrungBinhPhai = 0;
 uint32_t tgTinhOdomCu = 0; // thoi gian truoc do tinh odom
 uint32_t tgTinhOdom = 100; // thoi gian giua cac lan tinh odom (100ms)
 
-// Khởi tạo cảm biến la bàn QMC5883L và biến lưu góc gốc
-
-float theta_goc = 0.0f;
-
 void tinhVanToc(float deltaT) // Nhận deltaT từ hàm quản lý truyền vào
 {
     // CÁC BIẾN NÀY CẦN NHỚ GIÁ TRỊ CŨ -> Bắt buộc dùng static
@@ -87,34 +83,16 @@ void tinhVanToc(float deltaT) // Nhận deltaT từ hàm quản lý truyền và
 float odom_w_enc = 0;
 float odom_w_mpu = 0;
 
-// HÀM MỚI: TÍNH CẢ VẬN TỐC GÓC VÀ GÓC (Bằng Complementary Filter)
-void tinhTrangThaiGoc(float deltaT)
+// TÍNH CẢ VẬN TỐC GÓC VÀ GÓC
+void tinhThongSoGoc(float deltaT)
 {
-    // 1. TÍNH VẬN TỐC GÓC TỪ ENCODER (w_enc)
-    // Tính vận tốc từ 4 bánh
-    // odom_w_enc = (vtTrungBinhPhai - vtTrungBinhTrai) / KHOANGCACH2BANH;
+    // LẤY VẬN TỐC GÓC TỪ MPU6050 (w_gyro)
+    // Lưu ý: Biến mpu.vt_goc_z đã được cập nhật liên tục bên file main_cpp.cpp
+    odom_w_rad = Obj_MPU6050.vt_goc_z * (PI / 180.0f); // Đổi từ Độ/s sang Rad/s
 
-    // 2. LẤY VẬN TỐC GÓC TỪ MPU6050 (w_gyro)
-    // Lưu ý: Biến mpu.vt_goc_z đã được cập nhật liên tục bên file main.cpp
-    odom_w_mpu = MPU6050_1.vt_goc_z * (PI / 180.0f); // Đổi từ Độ/s sang Rad/s
-
-    // 3. LỌC BÙ (COMPLEMENTARY FILTER)
-    // Tin Gyro 98% (Chống trượt bánh), Tin Encoder 2% (Chống trôi tĩnh) KHÔNG DÙNG, GÂY NHIỄU NẶNG HƠN
-    // odom_w_rad = 0.98f * odom_w_mpu + 0.02f * odom_w_enc;
-    odom_w_rad = odom_w_mpu;
-
-    // 4. TÍCH PHÂN TÌM RA GÓC HƯỚNG CỦA XE
-    odom_theta_rad += odom_w_rad * deltaT;
-
-    // 5. CHUẨN HÓA GÓC (Giữ góc luôn nằm trong khoảng -PI đến PI)
-    if (odom_theta_rad > PI) {
-        odom_theta_rad -= 2.0f * PI;
-    } else if (odom_theta_rad < -PI) {
-        odom_theta_rad += 2.0f * PI;
-    }
-
-    // 6. CẬP NHẬT RA ĐỘ (Để hiển thị lên màn hình hoặc Web)
-    odom_theta_deg = odom_theta_rad * (180.0f / PI);
+    // GÓC HƯỚNG CỦA XE
+    odom_theta_deg = Obj_MPU6050.goc_z;
+    odom_theta_rad = odom_theta_deg *(PI / 180.0f);
 }
 
 void tinhToaDo(float deltaT)
@@ -140,9 +118,7 @@ void tinhOdom()
 
     // Chạy các hàm con theo đúng quy trình
     tinhVanToc(deltaT);
-    // tinhGoc();
-    // tinhVanTocGoc(deltaT);
-    tinhTrangThaiGoc(deltaT);
+    tinhThongSoGoc(deltaT);
     tinhToaDo(deltaT);
 }
 

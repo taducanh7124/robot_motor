@@ -6,7 +6,7 @@
 #include "const.hpp"
 #include "MotorControl.hpp"
 #include "MPU6050.hpp"
-#include "HCSR04HyperSonic.hpp"
+#include "HCSR04.hpp"
 #include "UART_DMA.hpp"
 #include "input_output.hpp"
 #include "data.hpp"
@@ -61,30 +61,22 @@ void controlOnDinh()
     MotorCtr_RR.control((uint16_t)fabsf(robot.motor_rear_right.ccrHT), static_cast<MotorDir>(robot.motor_rear_right.dir));
 }
 
-MPU6050 MPU6050_1;
-uint8_t dia_chi_tim_thay = 0;
+MPU6050 Obj_MPU6050;
 
 void main_cpp()
 {
+    // Kiem tra cam bien quan tinh san sang giao tiep i2c chua
+    while (HAL_I2C_IsDeviceReady(&hi2c1, Obj_MPU6050.dia_chi_i2c, 3, 10) != HAL_OK)
+    {
+        nhayLed();
+    }
     // Khoi tao cam bien quan tinh
     HAL_TIM_Base_Start(&htim10);
-    // Quet dia chi i2c
-    // dia_chi_tim_thay = 0;
-    for (uint8_t i = 1; i < 128; i++)
-    {
-        // Gửi thử tín hiệu đến tất cả 127 địa chỉ
-        if (HAL_I2C_IsDeviceReady(&hi2c1, (uint16_t)(i << 1), 3, 10) == HAL_OK)
-        {
-            dia_chi_tim_thay = i;
-            __NOP(); // <--- BẠN ĐẶT 1 CÁI BREAKPOINT (Dấu chấm đỏ) Ở DÒNG NÀY!!!
-        }
-    }
-
     // Nạp thông số và đánh thức cảm biến
-    MPU6050_1.init(&hi2c1, &htim10, (0x68 << 1));
-    if (!MPU6050_1.begin())
+    Obj_MPU6050.init(&hi2c1, &htim10);
+    if (!Obj_MPU6050.cauHinh())
     {
-        // Nếu lỗi I2C, nháy LED đỏ/nhanh báo hiệu
+        // Nếu lỗi I2C, nháy LED nhanh báo hiệu
         while (1)
         {
             nhayLed();
@@ -93,20 +85,20 @@ void main_cpp()
     }
 
     // Hiệu chuẩn Gyro Z (Lưu ý: Robot phải đứng im tuyệt đối trong 2 giây này)
-    // Nháy LED chậm báo hiệu đang hiệu chuẩn
+
     for (int i = 0; i < 6; i++)
     {
         nhayLed();
-        HAL_Delay(200);
+        HAL_Delay(200); // Nháy LED chậm báo hiệu đang hiệu chuẩn
     }
-    MPU6050_1.hieuChuan();
+    Obj_MPU6050.hieuChuan();
+    Obj_MPU6050.tg_do_imu_qk = __HAL_TIM_GET_COUNTER(Obj_MPU6050.htim);
 
-    // Bật LED sáng tĩnh báo hiệu đã sẵn sàng chạy
-    nhayLed();
-    MPU6050_1.lastTime = __HAL_TIM_GET_COUNTER(MPU6050_1.htim);
-
-    // Khoi tao cam bien sieu am
+    // Khoi tao timer cho cam bien sieu am
     HAL_TIM_Base_Start(&htim9);
+
+    // Khoi tao UART DMA gui du lieu cho pi
+    UART_DMA_6.init(&huart6, rxBuffer, sizeof(rxBuffer));
 
     // Khoi tao cac dong co
     MotorCtr_FL.init(&htim5, TIM_CHANNEL_1, DIR1_GPIO_Port, DIR1_Pin);
@@ -120,13 +112,8 @@ void main_cpp()
     HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_ALL);
     HAL_TIM_Encoder_Start(&htim4, TIM_CHANNEL_ALL);
 
-    // Khoi tao UART DMA gui du lieu cho pi
-    UART_DMA_6.init(&huart6, rxBuffer, sizeof(rxBuffer));
-
-    uint32_t tgNhayLedCu = 0;
-    uint32_t tgDoHSCu = 0; // thoi gian do cam bien sieu am cu
     uint32_t tgTinhGocZCu = 0;
-    uint32_t tgDieuKhienMotorCu = 0; // thoi gian dieu khien dong co
+    uint32_t tgDieuKhienMotorCu = 0; // thoi gian dieu khien dong co cũ
 
     while (1)
     {
@@ -137,7 +124,7 @@ void main_cpp()
         if (HAL_GetTick() - tgTinhGocZCu > 10)
         {
             tgTinhGocZCu = HAL_GetTick();
-            MPU6050_1.tinhGocZ();
+            Obj_MPU6050.tinhGocZ();
         }
 
         // xu ly input
@@ -151,13 +138,8 @@ void main_cpp()
             nhanDuLieuPi();
         }
 
-        // Đọc cảm biến siêu âm mỗi 50ms
-        // if (HAL_GetTick() - tgDoHSCu >= 50)
-        // {
-        //     tgDoHSCu = HAL_GetTick();
-        //     kiemTraHS();
-        //     kichHoatTrig(); // kich hoat chan trig de do cam bien sieu am
-        // }
+        // Đọc cảm biến siêu âm mỗi 25ms
+        doKhoangCach();
 
         if (HAL_GetTick() - tgDieuKhienMotorCu >= 10)
         {
@@ -193,17 +175,9 @@ void main_cpp()
     }
 }
 
-/*
-- ngat khi xung len va xung xuong
-- xung len sau khi kich hoat trig
-- xung xuong khi echo nhan tin hieu song sieu am phan hoi
-- khoang thoi gian giua xung len va xung xuong dung de tinh khoang cach
-*/
 extern "C" void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-    // ==========================================
-    // 1. XỬ LÝ NÚT BẤM (Chân PC14)
-    // ==========================================
+    // 1. XỬ LÝ NÚT BẤM (Chân PC14) đổi chế độ
     if (GPIO_Pin == GPIO_PIN_14)
     {
         static uint32_t thoiGianBamCu = 0;
@@ -218,14 +192,18 @@ extern "C" void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
         thoiGianBamCu = thoiGianBamMoi;
     }
 
-    // ==========================================
     // 2. XỬ LÝ CẢM BIẾN SIÊU ÂM (Các chân Echo: PB0, PB1, PB2, PB10)
-    // ==========================================
-    else if (GPIO_Pin == ECHO1_Pin || GPIO_Pin == ECHO2_Pin || 
+    /*
+    - ngat khi xung len va xung xuong
+    - xung len sau khi kich hoat trig
+    - xung xuong khi echo nhan tin hieu song sieu am phan hoi
+    - khoang thoi gian giua xung len va xung xuong dung de tinh khoang cach
+    */
+    else if (GPIO_Pin == ECHO1_Pin || GPIO_Pin == ECHO2_Pin ||
              GPIO_Pin == ECHO3_Pin || GPIO_Pin == ECHO4_Pin)
     {
-        uint32_t thoiGianHT = __HAL_TIM_GET_COUNTER(&htim9);             // Lấy giá trị timer9 để tính thời gian
+        uint16_t tgXungHT = __HAL_TIM_GET_COUNTER(&htim9);               // Lấy giá trị timer9 để tính thời gian
         GPIO_PinState trangThaiChan = HAL_GPIO_ReadPin(GPIOB, GPIO_Pin); // Đọc trạng thái chân echo đang cao hay thấp
-        xuLiNgat(GPIO_Pin, thoiGianHT, trangThaiChan);                   // Xử lý ngắt và tính khoảng cách
+        xuLiNgat(GPIO_Pin, tgXungHT, trangThaiChan);                     // Xử lý ngắt và tính khoảng cách
     }
 }

@@ -22,11 +22,6 @@ extern float odom_w_mpu;
 extern uint32_t tgTinhOdomCu;
 extern uint32_t tgTinhOdom;
 
-// Khởi tạo cảm biến la bàn QMC5883L và biến lưu góc gốc
-class QMC5883LCompass;
-extern QMC5883LCompass compass;
-extern float theta_goc; // goc theta goc cua robot, lay khi vua khoi tao
-
 // Hàm tính toán odometry
 void tinhOdom(void);
 

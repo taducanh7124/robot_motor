@@ -900,7 +900,7 @@
                     <item>rxBuffer</item>
                     <item>MotorCtr_FL</item>
                     <item>hi2c1</item>
-                    <item></item>
+                    <item />
                 </expressions>
                 <col-names>
                     <item>Expression</item>

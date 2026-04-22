@@ -1210,13 +1210,16 @@
                                 <name>$PROJ_DIR$\..\Core\Cpp\FunctionCpp\Inc\data.hpp</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\Core\Cpp\FunctionCpp\Inc\HCSR04HyperSonic.hpp</name>
+                                <name>$PROJ_DIR$\..\Core\Cpp\FunctionCpp\Inc\HCSR04.hpp</name>
                             </file>
                             <file>
                                 <name>$PROJ_DIR$\..\Core\Cpp\FunctionCpp\Inc\input_output.hpp</name>
                             </file>
                             <file>
                                 <name>$PROJ_DIR$\..\Core\Cpp\FunctionCpp\Inc\MotorControl.hpp</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\Core\Cpp\FunctionCpp\Inc\MPU6050.hpp</name>
                             </file>
                             <file>
                                 <name>$PROJ_DIR$\..\Core\Cpp\FunctionCpp\Inc\UART_DMA.hpp</name>
@@ -1231,13 +1234,16 @@
                                 <name>$PROJ_DIR$\..\Core\Cpp\FunctionCpp\Src\data.cpp</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\Core\Cpp\FunctionCpp\Src\HCSR04HyperSonic.cpp</name>
+                                <name>$PROJ_DIR$\..\Core\Cpp\FunctionCpp\Src\HCSR04.cpp</name>
                             </file>
                             <file>
                                 <name>$PROJ_DIR$\..\Core\Cpp\FunctionCpp\Src\input_output.cpp</name>
                             </file>
                             <file>
                                 <name>$PROJ_DIR$\..\Core\Cpp\FunctionCpp\Src\MotorControl.cpp</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\Core\Cpp\FunctionCpp\Src\MPU6050.cpp</name>
                             </file>
                             <file>
                                 <name>$PROJ_DIR$\..\Core\Cpp\FunctionCpp\Src\UART_DMA.cpp</name>
@@ -1249,29 +1255,11 @@
                         <group>
                             <name>Inc</name>
                             <file>
-                                <name>$PROJ_DIR$\..\Core\Cpp\LibraryCpp\Inc\i2c_software.hpp</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\Core\Cpp\LibraryCpp\Inc\MPU6050.hpp</name>
-                            </file>
-                            <file>
                                 <name>$PROJ_DIR$\..\Core\Cpp\LibraryCpp\Inc\pin_config.hpp</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\Core\Cpp\LibraryCpp\Inc\QMC5883LCompass.hpp</name>
                             </file>
                         </group>
                         <group>
                             <name>Src</name>
-                            <file>
-                                <name>$PROJ_DIR$\..\Core\Cpp\LibraryCpp\Src\i2c_software.cpp</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\Core\Cpp\LibraryCpp\Src\MPU6050.cpp</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\Core\Cpp\LibraryCpp\Src\QMC5883LCompass.cpp</name>
-                            </file>
                         </group>
                     </group>
                     <group>
@@ -1301,6 +1289,9 @@
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\Core\Src\gpio.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\Core\Src\i2c.c</name>
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\Core\Src\main.c</name>
@@ -1356,6 +1347,12 @@
             </file>
             <file>
                 <name>$PROJ_DIR$\..\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_gpio.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_i2c.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_i2c_ex.c</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\..\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_pwr.c</name>
