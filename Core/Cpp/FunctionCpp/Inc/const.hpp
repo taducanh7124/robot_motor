@@ -15,7 +15,7 @@
 #define XUNG1MET 128000.0f     // XUNG So xung tuong duong 1 met
 
 #define PI 3.14159265358979323846 // Hang so pi
-#define ALPHA 0.001f             // He so de tang/giam toc tu tu cho dong co
+#define ALPHA 0.001f              // He so de tang/giam toc tu tu cho dong co
 #define BETA 0.8f                 // He so loc van toc goc
 
 #define TIMER_10MS 10

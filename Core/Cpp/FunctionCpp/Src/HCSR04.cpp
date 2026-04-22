@@ -78,10 +78,10 @@ void kiemTraUS()
         }
     }
     // 2. Xóa dữ liệu đo của chu kỳ này
-    for (int i = 0; i < 4; i++)
-    {
-        Arr_HCSR04[i].khoangCach = 0.0f;
-    }
+    // for (int i = 0; i < 4; i++)
+    // {
+    //     Arr_HCSR04[i].khoangCach = 0.0f;
+    // }
 }
 
 // Hàm kích hoạt toàn bộ cảm biến siêu âm để đo khoảng cách
@@ -91,6 +91,7 @@ void doKhoangCach()
 {
     if (HAL_GetTick() - tgDoUS < 25) // Chỉ đo khoảng cách mỗi 25ms
         return;
+    kiemTraUS();
     tgDoUS = HAL_GetTick(); // Cập nhật thời gian bắt đầu đo
     Arr_HCSR04[ttDoUS].kichHoatTRIG();
     ttDoUS++;

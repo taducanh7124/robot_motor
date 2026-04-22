@@ -72,7 +72,7 @@ void MX_GPIO_Init(void)
   /*Configure GPIO pin : MODE_Pin */
   GPIO_InitStruct.Pin = MODE_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   HAL_GPIO_Init(MODE_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : PC15 */
@@ -91,7 +91,7 @@ void MX_GPIO_Init(void)
   /*Configure GPIO pins : ECHO1_Pin ECHO2_Pin ECHO3_Pin ECHO4_Pin */
   GPIO_InitStruct.Pin = ECHO1_Pin|ECHO2_Pin|ECHO3_Pin|ECHO4_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /*Configure GPIO pins : DIR4_Pin DIR3_Pin DIR2_Pin DIR1_Pin
