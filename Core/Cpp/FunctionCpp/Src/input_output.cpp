@@ -54,6 +54,13 @@ void debugNhanDuLieuPi()
         // Map vx từ m/s sang CCR
         debug_ccr_L = doi_van_toc(fabs(debug_vx_L), 0.20f, 1.47f, 15.0f, 100.0f);
         debug_ccr_R = doi_van_toc(fabs(debug_vx_R), 0.20f, 1.47f, 15.0f, 100.0f);
+
+        if (fabs(debug_ccr_L) < 8) {
+            debug_ccr_L = 0;
+        }
+        if (fabs(debug_ccr_R) < 8) {
+            debug_ccr_R = 0;
+        }
         // Gán lại dấu cho CCR
         debug_ccr_L = debug_ccr_L * debug_dir_L;
         debug_ccr_R = debug_ccr_R * debug_dir_R;
@@ -102,10 +109,10 @@ void nhanDuLieuPi()
         ccr_L = doi_van_toc(fabs(v_L), 0.20f, 1.47f, 15.0f, 100.0f) * dir_L;
         ccr_R = doi_van_toc(fabs(v_R), 0.20f, 1.47f, 15.0f, 100.0f) * dir_R;
         // Xung duoi 8 thi coi nhu khong chay
-        if (ccr_L < 8) {
+        if (fabs(ccr_L) < 8) {
             ccr_L = 0;
         }
-        if (ccr_R < 8) {
+        if (fabs(ccr_R) < 8) {
             ccr_R = 0;
         }
 
