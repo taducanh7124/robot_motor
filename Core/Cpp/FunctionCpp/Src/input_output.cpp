@@ -86,7 +86,7 @@ void nhanDuLieuPi()
     robot.state.isDataNew = false;
 
     // Bóc tách nhanh gọn lẹ bằng sscanf
-    if (sscanf((char *)rxBuffer, "%f,%f,%f", &vx, &vy, &w) == 0)
+    if (sscanf((char *)rxBuffer, "%f,%f", &vx, &w) == 2)
     {
         tgNhanDuLieuPiCu = HAL_GetTick(); // Cập nhật thời điểm nhận dữ liệu
 
@@ -101,6 +101,13 @@ void nhanDuLieuPi()
         // 3. MAP TỪ m/s SANG CCR & GÁN TRẢ LẠI DẤU
         ccr_L = doi_van_toc(fabs(v_L), 0.20f, 1.47f, 15.0f, 100.0f) * dir_L;
         ccr_R = doi_van_toc(fabs(v_R), 0.20f, 1.47f, 15.0f, 100.0f) * dir_R;
+        // Xung duoi 8 thi coi nhu khong chay
+        if (ccr_L < 8) {
+            ccr_L = 0;
+        }
+        if (ccr_R < 8) {
+            ccr_R = 0;
+        }
 
         // 4. GÁN THẲNG GIÁ TRỊ VÀO TARGET
         robot.motor_front_left.ccrTL = robot.motor_rear_left.ccrTL = ccr_L;
