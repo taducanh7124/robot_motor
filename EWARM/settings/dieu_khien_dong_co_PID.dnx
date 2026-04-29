@@ -20,7 +20,11 @@
         <stlinkResetStrategy>2</stlinkResetStrategy>
     </StLinkDriver>
     <DebugChecksum>
+<<<<<<< HEAD
         <Checksum>213138673</Checksum>
+=======
+        <Checksum>2316232472</Checksum>
+>>>>>>> branch_3
     </DebugChecksum>
     <Exceptions>
         <StopOnUncaught>_ 0</StopOnUncaught>
@@ -127,7 +131,11 @@
         <mode>0</mode>
     </DisassembleMode>
     <Breakpoints2>
+<<<<<<< HEAD
         <Bp0>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\Core\Cpp\FunctionCpp\Src\HCSR04.cpp}.76.13" 0 0 1 "" 0 "" 0</Bp0>
+=======
+        <Bp0>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\Core\Cpp\MainCpp\Src\main_cpp.cpp}.163.9" 0 0 1 "" 0 "" 0</Bp0>
+>>>>>>> branch_3
         <Count>1</Count>
     </Breakpoints2>
     <TermIOLog>

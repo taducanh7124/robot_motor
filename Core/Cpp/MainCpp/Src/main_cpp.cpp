@@ -66,33 +66,33 @@ MPU6050 Obj_MPU6050;
 void main_cpp()
 {
     // Kiem tra cam bien quan tinh san sang giao tiep i2c chua
-    while (HAL_I2C_IsDeviceReady(&hi2c1, Obj_MPU6050.dia_chi_i2c, 3, 10) != HAL_OK)
-    {
-        nhayLed();
-    }
+    // while (HAL_I2C_IsDeviceReady(&hi2c1, Obj_MPU6050.dia_chi_i2c, 3, 10) != HAL_OK)
+    // {
+    //     nhayLed();
+    // }
     // Khoi tao cam bien quan tinh
     HAL_TIM_Base_Start(&htim10);
     // Nạp thông số và đánh thức cảm biến
-    Obj_MPU6050.init(&hi2c1, &htim10);
-    if (!Obj_MPU6050.cauHinh())
-    {
-        // Nếu lỗi I2C, nháy LED nhanh báo hiệu
-        while (1)
-        {
-            nhayLed();
-            HAL_Delay(20);
-        }
-    }
+    // Obj_MPU6050.init(&hi2c1, &htim10);
+    // if (!Obj_MPU6050.cauHinh())
+    // {
+    //     // Nếu lỗi I2C, nháy LED nhanh báo hiệu
+    //     while (1)
+    //     {
+    //         nhayLed();
+    //         HAL_Delay(20);
+    //     }
+    // }
 
     // Hiệu chuẩn Gyro Z (Lưu ý: Robot phải đứng im tuyệt đối trong 2 giây này)
 
-    for (int i = 0; i < 6; i++)
-    {
-        nhayLed();
-        HAL_Delay(200); // Nháy LED chậm báo hiệu đang hiệu chuẩn
-    }
-    Obj_MPU6050.hieuChuan();
-    Obj_MPU6050.tg_do_imu_qk = __HAL_TIM_GET_COUNTER(Obj_MPU6050.htim);
+    // for (int i = 0; i < 6; i++)
+    // {
+    //     nhayLed();
+    //     HAL_Delay(200); // Nháy LED chậm báo hiệu đang hiệu chuẩn
+    // }
+    // Obj_MPU6050.hieuChuan();
+    // Obj_MPU6050.tg_do_imu_qk = __HAL_TIM_GET_COUNTER(Obj_MPU6050.htim);
 
     // Khoi tao timer cho cam bien sieu am
     HAL_TIM_Base_Start(&htim9);
@@ -121,11 +121,11 @@ void main_cpp()
         nhayLedMode();
 
         // Tinh cac thong so goc z
-        if (HAL_GetTick() - tgTinhGocZCu > 10)
-        {
-            tgTinhGocZCu = HAL_GetTick();
-            Obj_MPU6050.tinhGocZ();
-        }
+        // if (HAL_GetTick() - tgTinhGocZCu > 10)
+        // {
+        //     tgTinhGocZCu = HAL_GetTick();
+        //     Obj_MPU6050.tinhGocZ();
+        // }
 
         // xu ly input
         if (robot.state.isDebugMode == true)
@@ -139,7 +139,10 @@ void main_cpp()
         }
 
         // Đọc cảm biến siêu âm mỗi 25ms
+<<<<<<< HEAD
         
+=======
+>>>>>>> branch_3
         // doKhoangCach();
 
         if (HAL_GetTick() - tgDieuKhienMotorCu >= 10)
@@ -170,7 +173,6 @@ void main_cpp()
         }
         else
         {
-
             guiDuLieuPi();
         }
     }
@@ -185,10 +187,18 @@ extern "C" void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
         uint32_t thoiGianBamMoi = HAL_GetTick();
 
         // Chống dội phím 200ms
+<<<<<<< HEAD
         if (thoiGianBamMoi - thoiGianBamCu > 2000)
         {
             // Đảo cờ trạng thái của robot (Debug <-> Normal)
             robot.state.isDebugMode = !robot.state.isDebugMode;
+=======
+        if (thoiGianBamMoi - thoiGianBamCu > 3000)
+        {
+            // Đảo cờ trạng thái của robot (Debug <-> Normal)
+            // robot.state.isDebugMode = !robot.state.isDebugMode;
+            robot.state.isDebugMode = false; // tam thoi tat debug
+>>>>>>> branch_3
         }
         thoiGianBamCu = thoiGianBamMoi;
     }

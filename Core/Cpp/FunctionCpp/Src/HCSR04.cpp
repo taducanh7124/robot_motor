@@ -77,7 +77,11 @@ void kiemTraUS()
             break;            // Thoát vòng lặp kiểm tra ngay lập tức
         }
     }
+<<<<<<< HEAD
     // 2. Xóa dữ liệu đo của chu kỳ này
+=======
+    // 2. Xóa dữ liệu đo của chu kỳ này - tam thời không xóa dữ liệu khoảng cách nữa
+>>>>>>> branch_3
     // for (int i = 0; i < 4; i++)
     // {
     //     Arr_HCSR04[i].khoangCach = 0.0f;

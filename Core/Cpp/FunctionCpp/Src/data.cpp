@@ -15,6 +15,7 @@ float odom_theta_deg = 0.0f;
 float odom_vx = 0.0f;
 float odom_w_rad = 0.0f;
 
+float delta_s = 0.0f; // Khoảng cách di chuyển trong một chu kỳ tính toán
 float vtTrungBinhTrai = 0;
 float vtTrungBinhPhai = 0;
 
@@ -73,6 +74,8 @@ void tinhVanToc(float deltaT) // Nhận deltaT từ hàm quản lý truyền và
     vtTrungBinhPhai = (robot.motor_rear_right.vanToc + robot.motor_front_right.vanToc) / 2.0f;
     odom_vx = (vtTrungBinhTrai + vtTrungBinhPhai) / 2.0f;
 
+    // Tinh quang duong di duoc
+    delta_s = (delta_FL + delta_RL - delta_FR - delta_RR) / 4.0f * MET1XUNG; // Quãng đường trung bình di được
     // Cập nhật vị trí encoder cho lần sau
     xungQK_FL = xungHT_FL;
     xungQK_FR = xungHT_FR;
@@ -80,7 +83,6 @@ void tinhVanToc(float deltaT) // Nhận deltaT từ hàm quản lý truyền và
     xungQK_RR = xungHT_RR;
 }
 
-float odom_w_enc = 0;
 float odom_w_mpu = 0;
 
 // TÍNH CẢ VẬN TỐC GÓC VÀ GÓC
@@ -97,8 +99,8 @@ void tinhThongSoGoc(float deltaT)
 
 void tinhToaDo(float deltaT)
 {
-    odom_x += odom_vx * cosf(odom_theta_rad) * deltaT;
-    odom_y += odom_vx * sinf(odom_theta_rad) * deltaT;
+    odom_x += delta_s * cosf(odom_theta_rad);
+    odom_y += delta_s * sinf(odom_theta_rad);
 }
 
 // =======================================================
@@ -118,7 +120,7 @@ void tinhOdom()
 
     // Chạy các hàm con theo đúng quy trình
     tinhVanToc(deltaT);
-    tinhThongSoGoc(deltaT);
+    // tinhThongSoGoc(deltaT);
     tinhToaDo(deltaT);
 }
 
