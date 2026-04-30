@@ -1,0 +1,15 @@
+"C:\Users\taduc\Downloads\IAR Systems\Embedded Workbench 8.3\arm\bin\armproc.dll" 
+
+"C:\Users\taduc\Downloads\IAR Systems\Embedded Workbench 8.3\arm\bin\armstlink2.dll" 
+
+"C:\Users\taduc\Documents\STM32 IAR\ROBOT_F411\EWARM\ROBOT_F411\Exe\ROBOT_F411.out" 
+
+--plugin="C:\Users\taduc\Downloads\IAR Systems\Embedded Workbench 8.3\arm\bin\armbat.dll" 
+
+--device_macro="C:\Users\taduc\Downloads\IAR Systems\Embedded Workbench 8.3\arm\config\debugger\ST\STM32F4xx.dmac" 
+
+--flash_loader="C:\Users\taduc\Downloads\IAR Systems\Embedded Workbench 8.3\arm\config\flashloader\ST\FlashSTM32F411xE.board" 
+
+
+
+
