@@ -41,4 +41,12 @@ MotorControl.pbi: \
   C:\Users\taduc\Documents\STM32\ IAR\ROBOT_F411\EWARM/../Drivers/STM32F4xx_HAL_Driver/Inc\stm32f4xx_hal_tim.h \
   C:\Users\taduc\Documents\STM32\ IAR\ROBOT_F411\EWARM/../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h \
   C:\Users\taduc\Documents\STM32\ IAR\ROBOT_F411\EWARM/../Drivers/STM32F4xx_HAL_Driver/Inc\stm32f4xx_hal_uart.h \
-  C:\Users\taduc\Documents\STM32\ IAR\ROBOT_F411\EWARM\..\Core\Cpp\LibraryCpp\Inc\pin_config.hpp
+  C:\Users\taduc\Documents\STM32\ IAR\ROBOT_F411\EWARM\..\Core\Cpp\LibraryCpp\Inc\pin_config.hpp \
+  C:\Users\taduc\Downloads\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\inc\c\math.h \
+  C:\Users\taduc\Downloads\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\inc\c\DLib_float_setup.h \
+  C:\Users\taduc\Downloads\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\inc\c\xtgmath.h \
+  C:\Users\taduc\Downloads\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\inc\cpp\xtr1common \
+  C:\Users\taduc\Downloads\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\inc\cpp\cstdlib \
+  C:\Users\taduc\Downloads\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\inc\c\stdlib.h \
+  C:\Users\taduc\Downloads\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\inc\c\DLib_Product_stdlib.h \
+  C:\Users\taduc\Documents\STM32\ IAR\ROBOT_F411\EWARM\..\Core\Cpp\FunctionCpp\Inc\const.hpp

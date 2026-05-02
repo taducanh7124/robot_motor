@@ -3,9 +3,9 @@
 
 extern float debug_alpha;
 
-// Ham debug
-void debugNhanDuLieuPi(void);
-void debugGuiDuLieuPi(void);
+// Ham debug tam thoi khong dung
+// void debugNhanDuLieuPi(void);
+// void debugGuiDuLieuPi(void);
 
 // Ham chuc nang
 void nhanDuLieuPi(void);

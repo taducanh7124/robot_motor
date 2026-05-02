@@ -28,18 +28,19 @@ int layViTriUS(uint16_t GPIO_Pin)
         return 0;
     else if (GPIO_Pin == ECHO2_Pin)
         return 1;
-    else if (GPIO_Pin == ECHO3_Pin)
-        return 2;
-    else if (GPIO_Pin == ECHO4_Pin)
-        return 3;
+    // else if (GPIO_Pin == ECHO3_Pin)
+    //     return 2;
+    // else if (GPIO_Pin == ECHO4_Pin)
+    //     return 3;
     return -1;
 }
 
 // Mảng chứa 4 cảm biến siêu âm
-HCSR04 Arr_HCSR04[4] = {HCSR04(TRIG1_GPIO_Port, TRIG1_Pin),
-                        HCSR04(TRIG2_GPIO_Port, TRIG2_Pin),
-                        HCSR04(TRIG3_GPIO_Port, TRIG3_Pin),
-                        HCSR04(TRIG4_GPIO_Port, TRIG4_Pin)};
+HCSR04 Arr_HCSR04[2] = {HCSR04(TRIG1_GPIO_Port, TRIG1_Pin),
+                        HCSR04(TRIG2_GPIO_Port, TRIG2_Pin)};
+
+                        // HCSR04(TRIG3_GPIO_Port, TRIG3_Pin)};                        
+                        // HCSR04(TRIG4_GPIO_Port, TRIG4_Pin)};
 
 // Hàm xử lí ngắt
 void xuLiNgat(uint16_t GPIO_Pin, uint16_t _tgXungHT, GPIO_PinState _trangThaiChan)

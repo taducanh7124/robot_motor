@@ -18,11 +18,11 @@ float odom_w_rad = 0.0f;
 float vtTrungBinhTrai = 0;
 float vtTrungBinhPhai = 0;
 
-// Biến quản lý thời gian tổng
+float delta_s = 0.0f; // Quãng đường di chuyển trong khoảng thời gian deltaT
+// Biến quản lý thời gian
 uint32_t tgTinhOdomCu = 0; // thoi gian truoc do tinh odom
-uint32_t tgTinhOdom = 100; // thoi gian giua cac lan tinh odom (100ms)
 
-void tinhVanToc(float deltaT) // Nhận deltaT từ hàm quản lý truyền vào
+void tinhVanToc(float deltaT)
 {
     // CÁC BIẾN NÀY CẦN NHỚ GIÁ TRỊ CŨ -> Bắt buộc dùng static
     static int32_t xungQK_FL = 0; // xung qua khu của bánh trước trái
@@ -61,12 +61,15 @@ void tinhVanToc(float deltaT) // Nhận deltaT từ hàm quản lý truyền và
         delta_RR -= 65536;
     else if (delta_RR < -32768)
         delta_RR += 65536;
-
+    
+    // Tính quãng đường
+    delta_s = (delta_FL + delta_RL - delta_FR - delta_RR) / 4.0f * MET1XUNG;
+    
     // Tính vận tốc của từng bánh
     robot.motor_front_left.vanToc = (delta_FL * MET1XUNG) / deltaT;
-    robot.motor_front_right.vanToc = -(delta_FR * MET1XUNG) / deltaT; // bánh phía phải ngược chiều nên đổi dấu
     robot.motor_rear_left.vanToc = (delta_RL * MET1XUNG) / deltaT;
-    robot.motor_rear_right.vanToc = -(delta_RR * MET1XUNG) / deltaT; // bánh phía phải ngược chiều nên đổi dấu
+    robot.motor_front_right.vanToc = -(delta_FR * MET1XUNG) / deltaT; // bánh phía phải ngược chiều nên đổi dấu
+    robot.motor_rear_right.vanToc = -(delta_RR * MET1XUNG) / deltaT;  // bánh phía phải ngược chiều nên đổi dấu
 
     // Tinh vận tốc trung bình của robot dựa trên vận tốc của 4 bánh
     vtTrungBinhTrai = (robot.motor_rear_left.vanToc + robot.motor_front_left.vanToc) / 2.0f;
@@ -80,25 +83,22 @@ void tinhVanToc(float deltaT) // Nhận deltaT từ hàm quản lý truyền và
     xungQK_RR = xungHT_RR;
 }
 
-float odom_w_enc = 0;
-float odom_w_mpu = 0;
-
 // TÍNH CẢ VẬN TỐC GÓC VÀ GÓC
 void tinhThongSoGoc(float deltaT)
 {
     // LẤY VẬN TỐC GÓC TỪ MPU6050 (w_gyro)
-    // Lưu ý: Biến mpu.vt_goc_z đã được cập nhật liên tục bên file main_cpp.cpp
+    // Biến vt_goc_z đã được cập nhật liên tục bên file main_cpp.cpp
     odom_w_rad = Obj_MPU6050.vt_goc_z * (PI / 180.0f); // Đổi từ Độ/s sang Rad/s
 
     // GÓC HƯỚNG CỦA XE
     odom_theta_deg = Obj_MPU6050.goc_z;
-    odom_theta_rad = odom_theta_deg *(PI / 180.0f);
+    odom_theta_rad = odom_theta_deg * (PI / 180.0f);
 }
 
 void tinhToaDo(float deltaT)
 {
-    odom_x += odom_vx * cosf(odom_theta_rad) * deltaT;
-    odom_y += odom_vx * sinf(odom_theta_rad) * deltaT;
+    odom_x += delta_s * cosf(odom_theta_rad);
+    odom_y += delta_s * sinf(odom_theta_rad);
 }
 
 // =======================================================
@@ -107,7 +107,7 @@ void tinhToaDo(float deltaT)
 void tinhOdom()
 {
     uint32_t tgTinhOdomMoi = HAL_GetTick();
-    if (tgTinhOdomMoi - tgTinhOdomCu < tgTinhOdom)
+    if (tgTinhOdomMoi - tgTinhOdomCu < 100)
     {
         return; // Chưa đủ 100ms thì nghỉ
     }

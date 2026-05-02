@@ -59,8 +59,6 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define LED_MAIN_Pin GPIO_PIN_13
 #define LED_MAIN_GPIO_Port GPIOC
-#define MODE_Pin GPIO_PIN_14
-#define MODE_GPIO_Port GPIOC
 #define PWM1_Pin GPIO_PIN_0
 #define PWM1_GPIO_Port GPIOA
 #define PWM2_Pin GPIO_PIN_1
@@ -83,12 +81,8 @@ void Error_Handler(void);
 #define ECHO2_Pin GPIO_PIN_1
 #define ECHO2_GPIO_Port GPIOB
 #define ECHO2_EXTI_IRQn EXTI1_IRQn
-#define ECHO3_Pin GPIO_PIN_2
-#define ECHO3_GPIO_Port GPIOB
-#define ECHO3_EXTI_IRQn EXTI2_IRQn
-#define ECHO4_Pin GPIO_PIN_10
-#define ECHO4_GPIO_Port GPIOB
-#define ECHO4_EXTI_IRQn EXTI15_10_IRQn
+#define RST_MPU_Pin GPIO_PIN_2
+#define RST_MPU_GPIO_Port GPIOB
 #define DIR4_Pin GPIO_PIN_12
 #define DIR4_GPIO_Port GPIOB
 #define DIR3_Pin GPIO_PIN_13
@@ -109,10 +103,6 @@ void Error_Handler(void);
 #define TRIG2_GPIO_Port GPIOA
 #define B2_Pin GPIO_PIN_3
 #define B2_GPIO_Port GPIOB
-#define TRIG3_Pin GPIO_PIN_4
-#define TRIG3_GPIO_Port GPIOB
-#define TRIG4_Pin GPIO_PIN_5
-#define TRIG4_GPIO_Port GPIOB
 #define A4_Pin GPIO_PIN_6
 #define A4_GPIO_Port GPIOB
 #define B4_Pin GPIO_PIN_7

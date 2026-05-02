@@ -15,8 +15,9 @@
 #define XUNG1MET 128000.0f     // XUNG So xung tuong duong 1 met
 
 #define PI 3.14159265358979323846 // Hang so pi
-#define ALPHA 0.01f             // He so de tang/giam toc tu tu cho dong co
+#define ALPHA 0.05f               // He so de tang/giam toc tu tu cho dong co
 #define BETA 0.8f                 // He so loc van toc goc
+#define delta_ccr 10.0f           // Khi ccrHT gan bang ccrTL, cho ccrHT = ccrTL
 
 #define TIMER_10MS 10
 #define TIMER_20MS 20
@@ -30,12 +31,14 @@
 
 // Hàm map đa năng, an toàn, dùng được cho cả float và int
 template <typename T>
-T doi_van_toc(T _vx, T in_vx_min, T in_vx_max, T out_ccr_min, T out_ccr_max) {
+T doi_van_toc(T _vx, T in_vx_min, T in_vx_max, T out_ccr_min, T out_ccr_max)
+{
     // Chốt an toàn: Chống lỗi chia cho 0 gây treo chip STM32
-    if (in_vx_min == in_vx_max) {
-        return out_ccr_min; 
+    if (in_vx_min == in_vx_max)
+    {
+        return out_ccr_min;
     }
-    
+
     return (_vx - in_vx_min) * (out_ccr_max - out_ccr_min) / (in_vx_max - in_vx_min) + out_ccr_min;
 }
 

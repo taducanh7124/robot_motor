@@ -19,7 +19,7 @@ public:
     void kichHoatTRIG(); // Hàm kích hoạt chân TRIG để bắt đầu đo khoảng cách
 };
 
-extern HCSR04 Arr_HCSR04[4]; // Mảng chứa 4 cảm biến siêu âm
+extern HCSR04 Arr_HCSR04[2]; // Mảng chứa 4 cảm biến siêu âm
 extern bool isBlocked;       // Biến toàn cục để báo trạng thái có vật cản hay khôngâm
 
 void kiemTraUS();    // Kiem ta cam bien sieu am co phat hien vat can khong

@@ -10,17 +10,12 @@ extern float odom_y;
 extern float odom_theta_rad;
 extern float odom_theta_deg;
 
-// Vận tốc
+// Vận tốc và vận tốc góc
 extern float odom_vx;
 extern float odom_w_rad;
 
-// Goc
-extern float odom_w_enc;
-extern float odom_w_mpu;
-
 // Biến quản lý thời gian
 extern uint32_t tgTinhOdomCu;
-extern uint32_t tgTinhOdom;
 
 // Hàm tính toán odometry
 void tinhOdom(void);

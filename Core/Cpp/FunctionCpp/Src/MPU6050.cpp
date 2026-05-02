@@ -59,11 +59,10 @@ void MPU6050::hieuChuan()
         if (HAL_I2C_Mem_Read(hi2c, dia_chi_i2c, 0x47, 1, vt_goc_z_reg, 2, 10) == HAL_OK)
         {
             int16_t vt_goc_z_tho = (int16_t)(vt_goc_z_reg[0] << 8 | vt_goc_z_reg[1]); // Kết hợp 2 byte thành giá trị 16 bit có dấu
-            tong_vt_goc_z += vt_goc_z_tho;                                            // Cộng dồn vào tổng
+            tong_vt_goc_z += vt_goc_z_tho;
         }
         HAL_Delay(1);
     }
-
     // Chia trung bình và hệ số 131.0
     do_lech_z = ((float)tong_vt_goc_z / so_mau) / 131.0f;
 }
@@ -114,4 +113,17 @@ void MPU6050::tinhGocZ()
             goc_z += 360.0f;
         }
     }
+}
+
+void resetMPU()
+{
+    // 1. TẮT NGUỒN CẢM BIẾN (Reset)
+    // Kéo PC14 xuống mức THẤP (0V) để KHÓA transistor PNP, ngắt hoàn toàn nguồn VCC vào MPU.
+    HAL_GPIO_WritePin(RST_MPU_GPIO_Port, RST_MPU_Pin, GPIO_PIN_RESET);
+    //HAL_Delay(500); // Chờ 500ms để tụ trên mạch MPU xả sạch điện về 0V.
+
+    // 2. BẬT NGUỒN TRỞ LẠI (Hoạt động bình thường)
+    // Kéo PC14 lên mức CAO (3.3V) để MỞ transistor PNP, cấp nguồn VCC trở lại cho MPU.
+    HAL_GPIO_WritePin(RST_MPU_GPIO_Port, RST_MPU_Pin, GPIO_PIN_SET);
+    HAL_Delay(10); // Chờ 100ms để MPU boot xong firmware nội bộ trước khi giao tiếp I2C.
 }

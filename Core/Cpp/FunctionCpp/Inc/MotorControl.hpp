@@ -37,7 +37,7 @@ typedef struct
     uint8_t dir;
     float ccrHT;  // CCR hiện tại
     float ccrTL;  // CCR tương lai mong muốn đạt được
-    float vanToc; // Van toc tuong duong CCR (dung de tinh odom)
+    float vanToc; // Van toc tuong duong CCR (dung de tinh odom) va xem trong iar
 } DataControl_t;
 
 // Trang thai cua robot
@@ -65,4 +65,8 @@ extern MotorControl MotorCtr_FR;
 extern MotorControl MotorCtr_RL;
 extern MotorControl MotorCtr_RR;
 extern RobotDrive_t robot;
+
+// Khai bao ham dieu khien
+void controlOnDinh(void);
+void dungMotor(void);
 #endif

@@ -15,86 +15,40 @@
 extern TIM_HandleTypeDef htim9;
 extern TIM_HandleTypeDef htim10;
 extern I2C_HandleTypeDef hi2c1;
-float delta_ccr = 10.0f; // Khi ccrHT gan bang ccrTL, cho ccrHT = ccrTL
-
-// Hàm tăng tốc độ từ từ motor
-void controlOnDinh()
-{
-    // Bên trái trước
-    robot.motor_front_left.ccrHT += ALPHA * (robot.motor_front_left.ccrTL - robot.motor_front_left.ccrHT);
-    if (fabsf(robot.motor_front_left.ccrTL - robot.motor_front_left.ccrHT) < delta_ccr)
-    {
-        robot.motor_front_left.ccrHT = robot.motor_front_left.ccrTL;
-    }
-    // Bên trái sau
-    robot.motor_rear_left.ccrHT += ALPHA * (robot.motor_rear_left.ccrTL - robot.motor_rear_left.ccrHT);
-    if (fabsf(robot.motor_rear_left.ccrTL - robot.motor_rear_left.ccrHT) < delta_ccr)
-    {
-        robot.motor_rear_left.ccrHT = robot.motor_rear_left.ccrTL;
-    }
-
-    // Bên phải trước
-    robot.motor_front_right.ccrHT += ALPHA * (robot.motor_front_right.ccrTL - robot.motor_front_right.ccrHT);
-    if (fabsf(robot.motor_front_right.ccrTL - robot.motor_front_right.ccrHT) < delta_ccr)
-    {
-        robot.motor_front_right.ccrHT = robot.motor_front_right.ccrTL;
-    }
-    // Bên phải sau
-    robot.motor_rear_right.ccrHT += ALPHA * (robot.motor_rear_right.ccrTL - robot.motor_rear_right.ccrHT);
-    if (fabsf(robot.motor_rear_right.ccrTL - robot.motor_rear_right.ccrHT) < delta_ccr)
-    {
-        robot.motor_rear_right.ccrHT = robot.motor_rear_right.ccrTL;
-    }
-
-    // CẬP NHẬT BIẾN DIR VÀO STRUCT (Dựa trên dấu của ccrHT hiện tại)
-    // Ben trai
-    robot.motor_front_left.dir = (robot.motor_front_left.ccrHT >= 0) ? static_cast<uint8_t>(MotorDir::Forward) : static_cast<uint8_t>(MotorDir::Backward);
-    robot.motor_rear_left.dir = (robot.motor_rear_left.ccrHT >= 0) ? static_cast<uint8_t>(MotorDir::Forward) : static_cast<uint8_t>(MotorDir::Backward);
-    // Ben phai
-    robot.motor_front_right.dir = (robot.motor_front_right.ccrHT >= 0) ? static_cast<uint8_t>(MotorDir::Backward) : static_cast<uint8_t>(MotorDir::Forward);
-    robot.motor_rear_right.dir = (robot.motor_rear_right.ccrHT >= 0) ? static_cast<uint8_t>(MotorDir::Backward) : static_cast<uint8_t>(MotorDir::Forward);
-
-    // ĐIỀU KHIỂN MOTOR THẬT (Lấy giá trị từ struct ra)
-    MotorCtr_FL.control((uint16_t)fabsf(robot.motor_front_left.ccrHT), static_cast<MotorDir>(robot.motor_front_left.dir));
-    MotorCtr_FR.control((uint16_t)fabsf(robot.motor_front_right.ccrHT), static_cast<MotorDir>(robot.motor_front_right.dir));
-    MotorCtr_RL.control((uint16_t)fabsf(robot.motor_rear_left.ccrHT), static_cast<MotorDir>(robot.motor_rear_left.dir));
-    MotorCtr_RR.control((uint16_t)fabsf(robot.motor_rear_right.ccrHT), static_cast<MotorDir>(robot.motor_rear_right.dir));
-}
 
 MPU6050 Obj_MPU6050;
 
 void main_cpp()
 {
+    // KHOI TAO CAM BIEN QUAN TINH
+    // resetMPU(); chuyen sang main.c
     // Kiem tra cam bien quan tinh san sang giao tiep i2c chua
     while (HAL_I2C_IsDeviceReady(&hi2c1, Obj_MPU6050.dia_chi_i2c, 3, 10) != HAL_OK)
     {
         nhayLed();
+        HAL_Delay(50);
     }
-    // Khoi tao cam bien quan tinh
+    // Khoi dong timer dem cho cam bien quan tinh
     HAL_TIM_Base_Start(&htim10);
     // Nạp thông số và đánh thức cảm biến
     Obj_MPU6050.init(&hi2c1, &htim10);
+    // Cau hinh cam bien, Nếu lỗi I2C, nháy LED nhanh báo hiệu
     if (!Obj_MPU6050.cauHinh())
     {
-        // Nếu lỗi I2C, nháy LED nhanh báo hiệu
         while (1)
         {
             nhayLed();
-            HAL_Delay(20);
+            HAL_Delay(500);
         }
     }
-
-    // Hiệu chuẩn Gyro Z (Lưu ý: Robot phải đứng im tuyệt đối trong 2 giây này)
-
-    for (int i = 0; i < 6; i++)
-    {
-        nhayLed();
-        HAL_Delay(200); // Nháy LED chậm báo hiệu đang hiệu chuẩn
-    }
+    // Hiệu chuẩn Gyro Z (Robot phải đứng im tuyệt đối trong 2 giây này)
+    nhayLed();
+    HAL_Delay(2000);
     Obj_MPU6050.hieuChuan();
     Obj_MPU6050.tg_do_imu_qk = __HAL_TIM_GET_COUNTER(Obj_MPU6050.htim);
 
-    // Khoi tao timer cho cam bien sieu am
+    // KHOI TAO CAM BIEN SIEU AM
+    //  Khoi tao timer cho cam bien sieu am
     HAL_TIM_Base_Start(&htim9);
 
     // Khoi tao UART DMA gui du lieu cho pi
@@ -136,16 +90,11 @@ void main_cpp()
         if (HAL_GetTick() - tgDieuKhienMotorCu >= 10)
         {
             tgDieuKhienMotorCu = HAL_GetTick();
-
             if (isBlocked)
             {
                 // NẾU CÓ VẬT CẢN: Ghi đè lệnh mục tiêu (ccrTL) về 0!
-                robot.motor_front_left.ccrTL = 0;
-                robot.motor_front_right.ccrTL = 0;
-                robot.motor_rear_left.ccrTL = 0;
-                robot.motor_rear_right.ccrTL = 0;
+                dungMotor();
             }
-
             // GỌI HÀM ĐIỀU KHIỂN:
             // Hàm này sẽ lấy ccrTL (vừa bị ép về 0 ở trên, hoặc do pi gửi)
             controlOnDinh();
@@ -171,7 +120,7 @@ extern "C" void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
         if (thoiGianBamMoi - thoiGianBamCu > 3000)
         {
             // Đảo cờ trạng thái của robot (Debug <-> Normal)
-            robot.state.isDebugMode = true;
+            robot.state.isDebugMode = true; // tam thoi khong dung
         }
         thoiGianBamCu = thoiGianBamMoi;
     }
@@ -183,8 +132,9 @@ extern "C" void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     - xung xuong khi echo nhan tin hieu song sieu am phan hoi
     - khoang thoi gian giua xung len va xung xuong dung de tinh khoang cach
     */
-    else if (GPIO_Pin == ECHO1_Pin || GPIO_Pin == ECHO2_Pin ||
-             GPIO_Pin == ECHO3_Pin || GPIO_Pin == ECHO4_Pin)
+    else if (GPIO_Pin == ECHO1_Pin || GPIO_Pin == ECHO2_Pin)
+    // ||
+    //       GPIO_Pin == ECHO3_Pin) // || GPIO_Pin == ECHO4_Pin)
     {
         uint16_t tgXungHT = __HAL_TIM_GET_COUNTER(&htim9);               // Lấy giá trị timer9 để tính thời gian
         GPIO_PinState trangThaiChan = HAL_GPIO_ReadPin(GPIOB, GPIO_Pin); // Đọc trạng thái chân echo đang cao hay thấp
